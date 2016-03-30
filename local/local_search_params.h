@@ -5,8 +5,8 @@
  *      Author: default
  */
 
-#ifndef LOCAL_LOCALGENETICSEARCHPARAMS_H_
-#define LOCAL_LOCALGENETICSEARCHPARAMS_H_
+#ifndef LOCAL_LOCAL_SEARCH_PARAMS_H_
+#define LOCAL_LOCAL_SEARCH_PARAMS_H_
 
 class LocalGeneticSearchParams
 {
@@ -24,4 +24,4 @@ public:
 	int get_pop_size() { return pop_size; }
 };
 
-#endif /* LOCAL_LOCALGENETICSEARCHPARAMS_H_ */
+#endif /* LOCAL_LOCAL_SEARCH_PARAMS_H_ */

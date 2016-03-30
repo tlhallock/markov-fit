@@ -8,9 +8,8 @@
 #ifndef LOCAL_LOCAL_SEARCH_H_
 #define LOCAL_LOCAL_SEARCH_H_
 
-
-
-
+#include "local/local_search_params.h"
+#include "markov.h"
 
 void local_search(Markov& original, Markov& result, LocalGeneticSearchParams& params);
 

@@ -5,7 +5,7 @@
  *      Author: default
  */
 
-#include "local/LocalGeneticSearchParams.h"
+#include "local_search_params.h"
 
 LocalGeneticSearchParams::LocalGeneticSearchParams(Cdf& cdf) :
 	orig{orig},
