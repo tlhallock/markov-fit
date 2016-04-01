@@ -14,7 +14,10 @@
 
 
 void local_search(Markov& original, Markov& result, LocalGeneticSearchParams& params);
+void local_search_simple(Cdf& desired, Args& args, int maxiters, double tol);
 
+void local_search_simple_expm(const SummedCdf& desired, Args& initialChain, int maxiters, double tol);
+void local_search_simple_sim(Cdf& desired, Args& args, int maxiters, double tol);
 
 
 #endif /* LOCAL_LOCAL_SEARCH_H_ */

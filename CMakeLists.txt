@@ -15,15 +15,19 @@ set (Tutorial_VERSION_MAJOR 1)
 set (Tutorial_VERSION_MINOR 0)
 
 
-include_directories(${PROJECT_SOURCE_DIR})
+include_directories(${PROJECT_SOURCE_DIR} /usr/include/gsl/)
 
 add_library(ransample alias/ransampl.c)
  
 
-# add the executable
-#add_library(Test test.cpp generator.cpp )
-add_executable(Test test.cpp args.cpp markov.cpp cdf.cpp local/local_search_params.cpp local/local_search.cpp generator.cpp)
+
+add_executable(Test test.cpp args.cpp markov.cpp cdf.cpp local/local_search_params.cpp local/local_search.cpp generator.cpp expm/mexp.cpp)
+
+
+
 target_link_libraries(Test ransample)
+target_link_libraries(Test gsl gslcblas)
 
-# matlab/matrix_exp.cpp
-
+# add_executable(TestExpM matrix_exp/matrix_exponential.c matrix_exp/r8lib.c matrix_exp/c8lib.c)
+# target_link_libraries(TestExpM m)
+#add_executable(TestExpM matrix_exp/c8lib.cpp  matrix_exp/matrix_exponential.cpp  matrix_exp/matrix_exponential_prb.cpp  matrix_exp/r8lib.cpp  )

@@ -6,44 +6,26 @@
 #include <fstream>
 #include <limits>
 #include <cmath>
-//#include <random>
 
-Cdf::Cdf(int N, double min, double max) :
-	N{N},
+Cdf::Cdf(const Stencil& stencil) :
+	cached{stencil},
 	count{0},
-	lower{min},
-	upper{max},
-	counts{new int[N+1]},
-	F{new double[N+1]},
+	counts{new int[stencil.N+1]},
 	summed{false}
 {
 	reset();
 }
-//
-//
-//Cdf::Cdf(const Cdf& dimensions) :
-//	N{dimensions.get_n()},
-//	count{0},
-//	lower{dimensions.get_lower()},
-//	upper{dimensions.get_upper()},
-//	counts{new int[N+1]},
-//	F{new double[N+1]},
-//	summed{false}
-//{
-//	reset();
-//}
 
 
 
 Cdf::~Cdf()
 {
 	delete[] counts;
-	delete[] F;
 }
 
 void Cdf::reset()
 {
-  for (int i=0;i<N;i++)
+  for (int i=0;i<cached.bounds().N;i++)
     counts[i] = 0;
   count = 0;
   summed = false;
@@ -51,10 +33,10 @@ void Cdf::reset()
 
 void Cdf::merge(const Cdf& other)
 {
-	if (N != other.N || lower != other.lower || upper != other.upper)
+	if ( !(cached.bounds() == other.cached.bounds()))
 		throw BAD_CDF_MERGE_EXCEPTION;
 	
-	for (int i=0;i<N;i++)
+	for (int i=0;i<cached.bounds().N;i++)
 		counts[i] += other.counts[i];
 
 	count += other.count;
@@ -62,47 +44,27 @@ void Cdf::merge(const Cdf& other)
 
 double Cdf::compare(Cdf& other)
 {
-	if (N != other.N || lower != other.lower || upper != other.upper)
-		throw BAD_CDF_COMPARE_EXCEPTION;
-	
 	sum(); other.sum();
-
-	double max = 0;
-	for (int i=0;i<N;i++)
-	{
-		double diff = F[i] - other.F[i];
-		if (diff < 0)
-			diff = -diff;
-		if (max < diff)
-			max = diff;
-//		sum += diff * diff;
-	}
-
-	return max;
+	return cached.compare(other.cached);
 }
-
-#include <iostream>
 
 void Cdf::sample(const double value)
 {
 	summed = false;
-	if (value < lower || value > upper)
-	  {
-	    //std::cout << "Ignoring value not in range." << std::endl;
-	    		throw BAD_CDF_ARGUMENT_OUT_OF_RANGE;
-	    return;
-	  }
-	  
-	  
-	int index = (int) ((value - lower) * N / (upper - lower));
-	if (index < 0 || index > N)
-	  {
-	    //std::cout << "Ignoring value not in range." << std::endl;
-	    		throw BAD_CDF_ARGUMENT_OUT_OF_RANGE;
-	    return;
-	  }
-	counts[index]++;
 	count++;
+
+	if (value < cached.bounds().lower || value > cached.bounds().upper)
+	{
+		return;
+	}
+
+	int index = cached.bounds().map(value);
+//	std::cout << value << " = " << index << std::endl;
+	if (index < 0 || index > cached.bounds().N)
+	{
+		throw BAD_CDF_ARGUMENT_OUT_OF_RANGE;
+	}
+	counts[index]++;
 }
 
 
@@ -114,22 +76,10 @@ void Cdf::sum()
 		return;
 
 	int sum = 0;
-	for (int i=0;i<N;i++)
-	{
-		sum += counts[i];
-		F[i] = sum / (double) count;
-	}
+	for (int i=0;i<cached.bounds().N;i++)
+		cached.set(i, (sum += counts[i]) / (double) count);
 
 	summed = true;
-}
-
-void Cdf::debug()
-{
-	for (int i=0;i<N;i++)
-	{
-		std::cout << (lower + i / (double) N) << ":" << counts[i] << '\n';
-	}
-	std::cout << std::endl;
 }
 
 
@@ -141,20 +91,20 @@ void Cdf::print(const char *filename, const std::string& name)
     outstr << std::scientific << std::setprecision (std::numeric_limits<double>::digits10 + 1);
     
     outstr << "x_" << name << " = [";
-    for (int i=0;i<N;i++)
-	outstr << (lower + i / (double) N) << " ";
+    for (int i=0;i<cached.bounds().N;i++)
+	outstr << cached.bounds().unmap(i) << " ";
     outstr << "];\n";
     
     outstr << "y_prob_" << name << " = [";
-    for (int i=0;i<N;i++)
+    for (int i=0;i<cached.bounds().N;i++)
 	outstr << counts[i] / (double) count << " ";
     outstr << "];\n";
     
     sum();
     
     outstr << "y_cdf_" << name << " = [";
-    for (int i=0;i<N;i++)
-	outstr << F[i] << " ";
+    for (int i=0;i<cached.bounds().N;i++)
+	outstr << cached.get(i) << " ";
     outstr << "];\n";
     
     outstr << "plot(x_" << name << ", y_cdf_" << name << ");\n";
@@ -167,9 +117,9 @@ void Cdf::print(const char *filename, const std::string& name)
 double Cdf::get_moment(int moment) const
 {
 	double sum = 0;
-	for (int i=0;i<N;i++)
+	for (int i=0;i<cached.bounds().N;i++)
 	{
-		sum += std::pow(lower + (upper - lower) / N, moment) * (counts[i] / (double) count);
+		sum += std::pow(cached.bounds().unmap(i), moment) * (counts[i] / (double) count);
 	}
 	return sum;
 }
@@ -177,14 +127,15 @@ double Cdf::get_moment(int moment) const
 
 Cdf& Cdf::operator=(const Cdf& other)
 {
-	if (N != other.N) throw 1;
-	for (int i=0;i<N;i++)
+	if (!(cached.bounds() == other.cached.bounds()))
+		throw -1;
+
+	for (int i=0;i<cached.bounds().N;i++)
 		counts[i] = other.counts[i];
 	count = other.count;
 	if (other.summed)
 	{
-		for (int i=0;i<N;i++)
-			F[i] = other.F[i];
+		cached = other.cached;
 		summed = true;
 	}
 	else
@@ -193,24 +144,33 @@ Cdf& Cdf::operator=(const Cdf& other)
 	}
 	return *this;
 }
-Cdf& Cdf::operator=(Cdf& other)
+
+const SummedCdf& Cdf::getCdf()
 {
-	if (N != other.N) throw 1;
-	for (int i=0;i<N;i++)
-		counts[i] = other.counts[i];
-	count = other.count;
-	if (other.summed)
-	{
-		for (int i=0;i<N;i++)
-			F[i] = other.F[i];
-		summed = true;
-	}
-	else
-	{
-		summed = false;
-	}
-	return *this;
+	sum();
+	return cached;
 }
 
+void SummedCdf::print(const char* filename, const char* name) const
+{
+	    std::ofstream outstr;
+	    outstr.open(filename);
 
+	    outstr << std::scientific << std::setprecision (std::numeric_limits<double>::digits10 + 1);
 
+	    outstr << "x_" << name << " = [";
+	    for (int i=0;i<stencil.N;i++)
+		outstr << stencil.unmap(i) << " ";
+	    outstr << "];\n";
+
+	    outstr << "y_cdf_" << name << " = [";
+	    for (int i=0;i<stencil.N;i++)
+		outstr << F[i] << " ";
+	    outstr << "];\n";
+
+	    outstr << "plot(x_" << name << ", y_cdf_" << name << ");\n";
+
+	    outstr.close();
+}
+//	    std::cout << "Ignoring value not in range." << std::endl;
+//	    throw BAD_CDF_ARGUMENT_OUT_OF_RANGE;

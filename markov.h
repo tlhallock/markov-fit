@@ -18,7 +18,9 @@ private:
 
 public:
 	Markov(const Args& args);
-	~Markov();	
+	~Markov();
+
+	Markov& operator=(const Args& args);
 
 	void sample(Cdf& cdf, int ntimes) { sample(cdf, 0, nstates-1, ntimes); }
 	void sample(Cdf& cdf, int initialState, int hittingState, int ntimes);
@@ -32,6 +34,8 @@ public:
 			double tol,
 			std::mt19937& gen,
 			std::uniform_real_distribution<>& unif);
+
+	bool communicative(const double minimum) const;
 };
 
 //double markov_compare_chain_to_dist(Markov& markov, Cdf& cdf, double tolerance);

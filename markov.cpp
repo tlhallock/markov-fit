@@ -1,6 +1,8 @@
 
 #include "markov.h"
 
+#include "constants.h"
+
 #include <random>
 #include <tgmath.h>
 #include <cstdlib>
@@ -9,7 +11,7 @@
 Markov::Markov(const Args& args) :
   nstates{args.get_size()},
   comps{(ransampl_ws **) malloc (args.get_size() * sizeof (*comps))},
-  lambdas(new double[args.get_size()])
+  lambdas{new double[args.get_size()]}
   {
     for (int i=0;i<nstates;i++)
       {
@@ -79,8 +81,7 @@ double Markov::simulate(
 				state = ransampl_draw(comps[state], unif(gen), unif(gen));
 			}
 
-			if (time < cdf.get_upper())
-				cdf.sample(time);
+			cdf.sample(time);
 		}
 
 		double diff = tmp.compare(cdf);
@@ -88,6 +89,54 @@ double Markov::simulate(
 
 	return diff;
 }
+
+Markov& Markov::operator =(const Args& args)
+{
+	if (nstates != args.get_size())
+		throw SIZE_MISMATCH_IN_MARKOV_ASSIGN;
+	for (int i = 0; i < nstates; i++)
+	{
+		ransampl_set(comps[i], args.get_distro(i));
+		lambdas[i] = args.get_lambda(i);
+	}
+
+	return *this;
+}
+
+
+//
+//bool Markov::communicative(const double minimum) const
+//{
+//
+//	bool reachable[] = new bool[nstates];
+//	for (int i=0;i<nstates;i++)
+//		for (int j=0;j<nstates;j++)
+//			reachable[i][j] = false;
+//
+//
+//	for (int i=0;i<nstates;i++)
+//	{
+//		if (!reachable[i])
+//			continue;
+//		for (int j=0;j<nstates;j++)
+//			if (get_prob())
+//	}
+//
+//
+//	delete[] reachable;
+//
+//}
+
+
+
+
+
+
+
+
+
+
+
 //
 //double markov_compare_chain_to_dist(Markov& markov, Cdf& orig, double tolerance)
 //{

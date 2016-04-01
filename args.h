@@ -14,6 +14,8 @@ class Args
   Args(const char *filename);
   ~Args();
 
+  Args& operator=(const Args& other);
+
   bool feasible() const;
   void normalize();
   void randomize(double wait);

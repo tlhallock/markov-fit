@@ -3,6 +3,7 @@
 #define GENERATOR_H_
 
 #include "args.h"
+#include <random>
 
 class Generator
 {   
@@ -19,7 +20,10 @@ class Generator
 
 	~Generator();
 
+	Generator& operator=(const Generator& other);
+
 	void randomize(double var = 1.0);
+	void randomize(std::mt19937& gen, std::normal_distribution<>& dist);
 
 	int get_size() const { return n; }
 	double get_prob(int i, int j) const { return probs[n * i + j]; }

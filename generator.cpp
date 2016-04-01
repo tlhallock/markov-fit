@@ -70,12 +70,16 @@ void Generator::assign(Args& markov) const
 		{
 			if (get_prob(r, c) < 0)
 				markov.set_lambda(c, -get_prob(r, c));
-			sum += get_prob(r, c);
+			else
+				sum += get_prob(r, c);
 		}
 
-		for (int c=0;c<n;c++)
+		for (int c=0; c<n; c++)
 		{
-			markov.set_prob(r, c, get_prob(r, c) / sum);
+			if (c == r)
+				markov.set_prob(r, c, 0);
+			else
+				markov.set_prob(r, c, get_prob(r, c) / sum);
 		}
 	}
 }
@@ -99,6 +103,19 @@ void Generator::randomize(double var)
 			probs[i] = -probs[i];
 	}
 	
+	normalize();
+}
+
+void Generator::randomize(std::mt19937& gen, std::normal_distribution<>& dist)
+{
+	for (int i=0;i<n*n;i++)
+	{
+		probs[i] = dist(gen);
+		// oops, not what I meant... (should change distro)
+		if (probs[i] < 0)
+			probs[i] = -probs[i];
+	}
+
 	normalize();
 }
 
@@ -176,9 +193,18 @@ double Generator::get_distance(const Generator& other) const
 	return sum / get_size();
 }
 
+Generator& Generator::operator =(const Generator& other)
+{
+	if (get_size() != other.get_size())
+		throw SIZE_MISMATCH_IN_MARKOV_ASSIGN;
+	for (int r=0; r<n; r++)
+		for (int c=0;c<n;c++)
+			set_prob(r, c, other.get_prob(r, c));
+	return *this;
+}
+
 void Generator::set_radius_from(const Generator& other, double radius)
 {
-
 	for (int r=0;r<n;r++)
 	{
 		double sum1 = 0.0;
@@ -196,6 +222,7 @@ void Generator::set_radius_from(const Generator& other, double radius)
 		for (int c=0;c<n;c++)
 		{
 			double q = other.get_prob(r, c) + (get_prob(r, c) - other.get_prob(r, c)) / sum1;
+			if (q < 0) q = 0;
 			set_prob(r, c, q);
 			sum2 = q;
 		}
