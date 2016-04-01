@@ -51,47 +51,68 @@ Markov::~Markov()
      }
  }
  
-
 #define ITERATIONS 1000
-double compare_chain_to_dist(Markov& markov, Cdf& orig, double tolerance)
+double Markov::simulate(
+		Cdf& cdf,
+		Cdf& tmp,
+		double tol,
+		std::mt19937& gen,
+		std::uniform_real_distribution<>& unif)
 {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_real_distribution<> unif1(0, 1);
-   
-	double prev_diff = -1;
-	double change	 = 1e300;
-   
-	Cdf comp(orig.get_n(), orig.get_lower(), orig.get_upper());
-	
 	const int initialState = 0;
-	const int hittingState = markov.nstates-1;
-	
+	const int hittingState = nstates-1;
+
+	double diff = 0.0;
 	int tries = 0;
 	do
 	{
-		for (int i=0;i<ITERATIONS;i++)
+		tmp = cdf;
+
+		for (int i=0; i<ITERATIONS; i++)
 		{
 			int state = initialState;
 
 			double time = 0;
 			while (state != hittingState)
 			{
-				time += -log(unif1(gen)) / markov.lambdas[state];
-				state = ransampl_draw(markov.comps[state], unif1(gen), unif1(gen));
+				time += -log(unif(gen)) / lambdas[state];
+				state = ransampl_draw(comps[state], unif(gen), unif(gen));
 			}
-			
-			if (time < orig.get_upper())
-				comp.sample(time);
+
+			if (time < cdf.get_upper())
+				cdf.sample(time);
 		}
-		
-		double diff = comp.compare(orig);
-		change = diff - prev_diff;
-		if (change < 0) change = -change;
-		prev_diff = diff;
-	} while (change >= tolerance && tries++ < 10);
-	
-	comp.print("output/approximation.m", "markov");
-     
-     return prev_diff;
+
+		double diff = tmp.compare(cdf);
+	} while (diff <= tol && tries++ < 100);
+
+	return diff;
 }
+//
+//double markov_compare_chain_to_dist(Markov& markov, Cdf& orig, double tolerance)
+//{
+//	std::random_device rd;
+//	std::mt19937 gen(rd());
+//	std::uniform_real_distribution<> unif1(0, 1);
+//
+//	double prev_diff = -1;
+//	double change = 1e300;
+//
+//	Cdf comp(orig.get_n(), orig.get_lower(), orig.get_upper());
+//
+//	int tries = 0;
+//	do
+//	{
+//		markov.simulate(comp, ITERATIONS, gen, unif1);
+//
+//		double diff = comp.compare(orig);
+//		change = diff - prev_diff;
+//		if (change < 0)
+//			change = -change;
+//		prev_diff = diff;
+//	} while (change >= tolerance && tries++ < 10);
+//
+//	comp.print("output/approximation.m", "markov");
+//
+//	return prev_diff;
+//}

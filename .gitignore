@@ -33,3 +33,5 @@ CMakeFiles/
 cmake_install.cmake
 
 Test
+
+output/

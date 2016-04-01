@@ -6,10 +6,11 @@
 #include "args.h"
 #include "cdf.h"
 
+#include <random>
+
 
 class Markov
 {
-	friend double compare_chain_to_dist(Markov& markov, Cdf& cdf, double tolerance);
 private:
 	int nstates;
 	ransampl_ws** comps;
@@ -22,9 +23,17 @@ public:
 	void sample(Cdf& cdf, int ntimes) { sample(cdf, 0, nstates-1, ntimes); }
 	void sample(Cdf& cdf, int initialState, int hittingState, int ntimes);
 
-	int get_n_nstates() { return nstates; }
+	int get_n_states() { return nstates; }
+
+
+	double simulate(
+			Cdf& cdf,
+			Cdf& tmp,
+			double tol,
+			std::mt19937& gen,
+			std::uniform_real_distribution<>& unif);
 };
 
-double compare_chain_to_dist(Markov& markov, Cdf& cdf, double tolerance);
+//double markov_compare_chain_to_dist(Markov& markov, Cdf& cdf, double tolerance);
 
 #endif

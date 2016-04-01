@@ -20,15 +20,15 @@ class Args
 
   int get_size() const { return n; }
   double get_prob(int i, int j) const { return probs[n * i + j]; }
+  void set_prob(int i, int j, double val) const { probs[n * i + j] = val; }
+
   double get_lambda(int i) const { return lambdas[i]; }
+  void set_lambda(int i, double val) {lambdas[i] = val; }
   double* get_distro(int i) const { return &probs[i * n]; }
   
   void write(const char *filename);
   void writeMatlab(const char *filename);
 
-
-  double get_distance(const Args& other) const;
-  void set_radius(const Args& other, double radius);
 };
 
 

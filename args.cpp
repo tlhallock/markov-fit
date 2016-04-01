@@ -20,28 +20,28 @@ Args::Args(int n) :
 
 Args::Args(const char *filename)
 {
-	
-    std::ifstream instr(filename);
-    instr >> n;
-    probs = new double[n*n];
-    lambdas = new double[n];
-    for (int i=0;i<n;i++)
-        instr >> lambdas[i];
-    for (int i=0;i<n * n;i++)
-        instr >> probs[i];
-    
-    instr.close();
+	n = 0;
+	std::ifstream instr(filename);
+	instr >> n;
+	probs = new double[n * n];
+	lambdas = new double[n];
+	for (int i = 0; i < n; i++)
+		instr >> lambdas[i];
+	for (int i = 0; i < n * n; i++)
+		instr >> probs[i];
+
+	instr.close();
 }
 
 Args::~Args()
 {
-  delete[] probs;
-  delete[] lambdas;
+	delete[] probs;
+	delete[] lambdas;
 }
 
 bool Args::feasible() const
 {
-  return false;
+	return false;
 }
 
 void Args::randomize(double wait)
@@ -55,55 +55,6 @@ void Args::randomize(double wait)
         
 	for (int i=0;i<n;i++)
 		lambdas[i] = wait * unif1(gen);
-
-	normalize();
-}
-
-double Args::get_distance(const Args& other) const
-{
-	double sum = 0.0;
-	for (int i=0;i<n*n;i++)
-	{
-		double d = probs[i] - other.probs[i];
-		sum += d*d;
-	}
-
-	for (int i=0;i<n;i++)
-	{
-		double d = lambdas[i] - other.lambdas[i];
-		sum += d*d;
-	}
-	return sum;
-}
-
-void Args::set_radius(const Args& other, double radius)
-{
-	double sum = 0.0;
-	for (int i=0;i<n*n;i++)
-	{
-		double d = probs[i] - other.probs[i];
-		sum += d*d;
-	}
-
-	for (int i=0;i<n;i++)
-	{
-		double d = lambdas[i] - other.lambdas[i];
-		sum += d*d;
-	}
-
-	for (int i=0;i<n*n;i++)
-	{
-		probs[i] = other.probs[i] + (probs[i] - other.probs[i]) / sum;
-		double d =
-		sum += d*d;
-	}
-
-	for (int i=0;i<n;i++)
-	{
-		double d = lambdas[i] - other.lambdas[i];
-		sum += d*d;
-	}
-
 
 	normalize();
 }

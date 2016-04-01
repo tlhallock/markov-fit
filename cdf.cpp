@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <fstream>
 #include <limits>
+#include <cmath>
 //#include <random>
 
 Cdf::Cdf(int N, double min, double max) :
@@ -18,6 +19,20 @@ Cdf::Cdf(int N, double min, double max) :
 {
 	reset();
 }
+//
+//
+//Cdf::Cdf(const Cdf& dimensions) :
+//	N{dimensions.get_n()},
+//	count{0},
+//	lower{dimensions.get_lower()},
+//	upper{dimensions.get_upper()},
+//	counts{new int[N+1]},
+//	F{new double[N+1]},
+//	summed{false}
+//{
+//	reset();
+//}
+
 
 
 Cdf::~Cdf()
@@ -147,3 +162,55 @@ void Cdf::print(const char *filename, const std::string& name)
     outstr.close();
     
 }
+
+
+double Cdf::get_moment(int moment) const
+{
+	double sum = 0;
+	for (int i=0;i<N;i++)
+	{
+		sum += std::pow(lower + (upper - lower) / N, moment) * (counts[i] / (double) count);
+	}
+	return sum;
+}
+
+
+Cdf& Cdf::operator=(const Cdf& other)
+{
+	if (N != other.N) throw 1;
+	for (int i=0;i<N;i++)
+		counts[i] = other.counts[i];
+	count = other.count;
+	if (other.summed)
+	{
+		for (int i=0;i<N;i++)
+			F[i] = other.F[i];
+		summed = true;
+	}
+	else
+	{
+		summed = false;
+	}
+	return *this;
+}
+Cdf& Cdf::operator=(Cdf& other)
+{
+	if (N != other.N) throw 1;
+	for (int i=0;i<N;i++)
+		counts[i] = other.counts[i];
+	count = other.count;
+	if (other.summed)
+	{
+		for (int i=0;i<N;i++)
+			F[i] = other.F[i];
+		summed = true;
+	}
+	else
+	{
+		summed = false;
+	}
+	return *this;
+}
+
+
+

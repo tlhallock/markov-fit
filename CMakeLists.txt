@@ -22,7 +22,7 @@ add_library(ransample alias/ransampl.c)
 
 # add the executable
 #add_library(Test test.cpp generator.cpp )
-add_executable(Test test.cpp args.cpp markov.cpp cdf.cpp local/local_search_params.cpp local/local_search.cpp)
+add_executable(Test test.cpp args.cpp markov.cpp cdf.cpp local/local_search_params.cpp local/local_search.cpp generator.cpp)
 target_link_libraries(Test ransample)
 
 # matlab/matrix_exp.cpp

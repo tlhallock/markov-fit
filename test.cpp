@@ -9,6 +9,7 @@
 
 #include "markov.h"
 #include "local/local_search.h"
+#include "generator.h"
 
 
 static void testDiff()
@@ -45,29 +46,50 @@ Cdf * createUnifCdf(int res, int numSamples)
 int main(int argc, char **argv)
 {
 	std::srand ( unsigned ( std::time(0) ) );
+
+
+	std::random_device rd;
+	std::mt19937 gen{rd()};
+	std::uniform_real_distribution<> unif_dist{0, 1};
   
   
 	Args args(3);
 	args.randomize(5);
 	args.write("output/markov.txt");
-	
-//	Args args("output/markov.txt");
-	
-	Cdf *unif = createUnifCdf(100, 10000);
-	
-	unif->print("output/unif_plot.m", "unif");
-	
-	
-	Markov markov(args);
-	double diff = compare_chain_to_dist(markov, *unif, 1e-2);
-	
-	Markov result{3};
 
-	LocalGeneticSearchParams goal{*unif};
-	local_search(markov, result, goal);
+//	Cdf *unif = createUnifCdf(100, 10000);
+//	unif->print("output/unif_plot.m", "unif");
 
+	Markov markov{args};
+
+	Cdf cdf{100, 0, 5};
+	Cdf tmp{cdf};
+
+	double error = markov.simulate(cdf, tmp, 1e-3, gen, unif_dist);
+	std::cout << "The error was " << error << "." << std::endl;
+
+	cdf.print("output/approximation.m", "markov");
+
+	Generator generator{args};
+	generator.writeMatlab("output/generator.m");
+
+	std::cout << "The mean was " << cdf.get_moment(1) << std::endl;
+
+
+
+
+
+//
+//	Markov markov(args);
+//	double diff = compare_chain_to_dist(markov, *unif, 1e-2);
+//
+//	Markov result{3};
+//
+//	LocalGeneticSearchParams goal{*unif};
+//	local_search(markov, result, goal);
+//
 	
-	delete unif;
+//	delete unif;
 	
 	return 0;
 }

@@ -17,7 +17,12 @@ private:
 	bool summed;
 public:
 	Cdf(const int N, const double min, const double max);
+	// Does not initialize with the others data!!!!!!!!!
+	Cdf(const Cdf& dimensions) : Cdf{dimensions.get_n(), dimensions.get_lower(), dimensions.get_upper()} {}
 	~Cdf();
+
+	Cdf& operator=(const Cdf& other);
+	Cdf& operator=(Cdf& other);
 
 	void reset();
 	void merge(const Cdf& other);
@@ -25,15 +30,17 @@ public:
 
 	void sample(const double value);
 
-	void sum();
 	
 	int get_n() const { return N; }
-	int get_lower() const { return lower; }
-	int get_upper() const { return upper; }
+	double get_lower() const { return lower; }
+	double get_upper() const { return upper; }
 	
 	void print(const char *filename, const std::string& name);
 	
 	void debug();
+
+	void sum();
+	double get_moment(int moment) const;
 };
 
 

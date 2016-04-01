@@ -14,9 +14,16 @@ void local_search(Markov& original, Markov& result, LocalGeneticSearchParams& pa
 	Args ** chains = new Args*[params.get_pop_size()];
 	for (int i=0;i<params.get_pop_size(); i++)
 	{
-		chains[i] = new Args{original.get_n_nstates()};
+		chains[i] = new Args{original.get_n_states()};
 		chains[i]->randomize(1.0);
 	}
+
+
+//
+//	Generator gen2{args.get_size()};
+//	gen2.randomize();
+//
+//	gen2.set_radius_from(generator, 1.0);
 
 
 

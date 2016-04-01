@@ -6,6 +6,7 @@
 #include <random>
 #include <fstream>
 #include <iomanip>
+#include <cmath>
 
 
 
@@ -18,18 +19,67 @@ Generator::Generator(int n) :
   }
   
   
+
 Generator::Generator(const char *filename)
-  {
-    std::ifstream instr(filename);
-    
-    instr >> n;
-    
-    probs = new double[n*n];
-    for (int i=0;i<n * n;i++)
-        instr >> probs[i];
-    
-    instr.close();
-  }
+{
+	std::ifstream instr(filename);
+
+	instr >> n;
+
+	probs = new double[n * n];
+	for (int i = 0; i < n * n; i++)
+		instr >> probs[i];
+
+	instr.close();
+}
+
+
+
+Generator::Generator(const Args& markov) :
+		n{markov.get_size()},
+		probs{new double[n*n]}
+
+{
+	for (int r=0;r<n;r++)
+	{
+		const double lambda = markov.get_lambda(r);
+		double sum = 0.0;
+
+		for (int c=0; c<n; c++)
+		{
+			if (c == r)
+				continue;
+			double q = lambda * markov.get_prob(r, c);
+			set_prob(r, c, q);
+			sum += q;
+		}
+
+		set_prob(r, r, -sum);
+	}
+}
+
+/**
+ * Doesn't handle non-communicating states...
+ */
+void Generator::assign(Args& markov) const
+{
+	for (int r=0;r<n;r++)
+	{
+		double sum = 0;
+		for (int c=0; c<n; c++)
+		{
+			if (get_prob(r, c) < 0)
+				markov.set_lambda(c, -get_prob(r, c));
+			sum += get_prob(r, c);
+		}
+
+		for (int c=0;c<n;c++)
+		{
+			markov.set_prob(r, c, get_prob(r, c) / sum);
+		}
+	}
+}
+
 
 Generator::~Generator()
 {
@@ -42,34 +92,32 @@ void Generator::randomize(double var)
 	std::mt19937 gen(rd());
 	std::normal_distribution<> d(0,var);
 	for (int i=0;i<n*n;i++)
+	{
 		probs[i] = d(gen);
+		// oops, not what I meant... (should change distro)
+		if (probs[i] < 0)
+			probs[i] = -probs[i];
+	}
 	
 	normalize();
 }
 
 void Generator::normalize()
 {
-  for (int i=0;i<n;i++)
-    {
-      double avg = 0;
-    for (int j=0;j<n;j++)
-      {
-	avg += probs[n * i + j];
-      }
-      avg /= n;
-    for (int j=0;j<n;j++)
-      {
-	probs[n * i + j] -= avg;
-      }
-    }
+	for (int i = 0; i < n; i++)
+	{
+		double sum = 0;
+		for (int j = 0; j < n; j++)
+		{
+			if (i == j)
+				continue;
+			sum += get_prob(i, j);
+		}
+
+		set_prob(i, i, -sum);
+	}
 }
 
-
-
-//Generator* read(const char *filename)
-//{
-//	return new Generator(filename);
-//}
 
 void Generator::write(const char *filename)
 {
@@ -107,4 +155,50 @@ void Generator::writeMatlab(const char *filename)
     
     outstr.close();
 }
-  
+
+double Generator::get_distance(const Generator& other) const
+{
+	double sum = 0.0;
+
+	for (int r=0; r<n; r++)
+	{
+		double debug = 0.0;
+		for (int c=0;c<n;c++)
+		{
+			if (r==c)
+				continue;
+			double d = get_prob(r, c) - other.get_prob(r, c);
+			sum += d*d;
+			debug += d*d;
+		}
+	}
+
+	return sum / get_size();
+}
+
+void Generator::set_radius_from(const Generator& other, double radius)
+{
+
+	for (int r=0;r<n;r++)
+	{
+		double sum1 = 0.0;
+		for (int c=0;c<n;c++)
+		{
+			if (r==c)
+				continue;
+			double d = get_prob(r, c) - other.get_prob(r, c);
+			sum1 += d*d;
+		}
+
+		sum1 = std::sqrt(sum1);
+
+		double sum2 = 0.0;
+		for (int c=0;c<n;c++)
+		{
+			double q = other.get_prob(r, c) + (get_prob(r, c) - other.get_prob(r, c)) / sum1;
+			set_prob(r, c, q);
+			sum2 = q;
+		}
+		set_prob(r, r, -sum2);
+	}
+}
