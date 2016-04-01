@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <random>
-#include <cstdlib>      // std::rand, std::srand
+#include <cstdlib>
 #include <ctime>
 
 
@@ -62,7 +62,9 @@ int main(int argc, char **argv)
 	double diff = compare_chain_to_dist(markov, *unif, 1e-2);
 	
 	Markov result{3};
-	local_search(markov, result, -1);
+
+	LocalGeneticSearchParams goal{*unif};
+	local_search(markov, result, goal);
 
 	
 	delete unif;

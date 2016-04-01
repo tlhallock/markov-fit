@@ -25,6 +25,10 @@ class Args
   
   void write(const char *filename);
   void writeMatlab(const char *filename);
+
+
+  double get_distance(const Args& other) const;
+  void set_radius(const Args& other, double radius);
 };
 
 

@@ -11,14 +11,21 @@
 
 void local_search(Markov& original, Markov& result, LocalGeneticSearchParams& params)
 {
-	Markov ** chains = new Markov*[params.get_pop_size()];
-
+	Args ** chains = new Args*[params.get_pop_size()];
 	for (int i=0;i<params.get_pop_size(); i++)
 	{
-		chains[i] = new Markov{original};
+		chains[i] = new Args{original.get_n_nstates()};
+		chains[i]->randomize(1.0);
 	}
 
 
 
+
+
+
+	for (int i=0;i<params.get_pop_size(); i++)
+	{
+		delete chains[i];
+	}
 	delete[] chains;
 }

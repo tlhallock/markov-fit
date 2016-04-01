@@ -8,6 +8,8 @@
 #ifndef LOCAL_LOCAL_SEARCH_PARAMS_H_
 #define LOCAL_LOCAL_SEARCH_PARAMS_H_
 
+#include "cdf.h"
+
 class LocalGeneticSearchParams
 {
 private:
@@ -18,7 +20,6 @@ private:
 public:
 	LocalGeneticSearchParams(Cdf& orig);
 	virtual ~LocalGeneticSearchParams();
-
 
 
 	int get_pop_size() { return pop_size; }

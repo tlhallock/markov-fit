@@ -59,6 +59,55 @@ void Args::randomize(double wait)
 	normalize();
 }
 
+double Args::get_distance(const Args& other) const
+{
+	double sum = 0.0;
+	for (int i=0;i<n*n;i++)
+	{
+		double d = probs[i] - other.probs[i];
+		sum += d*d;
+	}
+
+	for (int i=0;i<n;i++)
+	{
+		double d = lambdas[i] - other.lambdas[i];
+		sum += d*d;
+	}
+	return sum;
+}
+
+void Args::set_radius(const Args& other, double radius)
+{
+	double sum = 0.0;
+	for (int i=0;i<n*n;i++)
+	{
+		double d = probs[i] - other.probs[i];
+		sum += d*d;
+	}
+
+	for (int i=0;i<n;i++)
+	{
+		double d = lambdas[i] - other.lambdas[i];
+		sum += d*d;
+	}
+
+	for (int i=0;i<n*n;i++)
+	{
+		probs[i] = other.probs[i] + (probs[i] - other.probs[i]) / sum;
+		double d =
+		sum += d*d;
+	}
+
+	for (int i=0;i<n;i++)
+	{
+		double d = lambdas[i] - other.lambdas[i];
+		sum += d*d;
+	}
+
+
+	normalize();
+}
+
 void Args::normalize()
 {
   for (int i=0;i<n;i++)

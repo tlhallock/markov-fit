@@ -17,6 +17,5 @@ LocalGeneticSearchParams::LocalGeneticSearchParams(Cdf& cdf) :
 
 LocalGeneticSearchParams::~LocalGeneticSearchParams()
 {
-	// TODO Auto-generated destructor stub
 }
 
