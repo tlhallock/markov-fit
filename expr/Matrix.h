@@ -8,14 +8,6 @@
 #ifndef EXPR_MATRIX_H_
 #define EXPR_MATRIX_H_
 
-typedef struct
-{
-	int m;
-	int n;
-
-	expr *elems;
-} matrix_exp;
-
 matrix_exp *matrix_new(int m, int n);
 void        matrix_free(matrix_exp *exp);
 

@@ -26,6 +26,15 @@ typedef enum
 
 typedef struct
 {
+	int m;
+	int n;
+
+	expr *elems;
+} matrix_exp;
+
+
+typedef struct
+{
 	expr *left;
 	expr *right;
 } child;
