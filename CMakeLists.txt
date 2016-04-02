@@ -3,7 +3,7 @@ project (TestDirect)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g ")
 
-set (CMAKE_BINARY_DIR "./bin")
+set (CMAKE_BINARY_DIR "./output")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
