@@ -33,10 +33,10 @@ expr_type ExprValue::get_type() const
 ExpressionRename* ExprValue::simplify(const SimplificationRules& rules)
 {
 	if (value == 0)
-		return new ExprZero { };
+		return new ExprZero{};
 
 	if (value == 1)
-		return new ExprOne { };
+		return new ExprOne{};
 
 	return this;
 }

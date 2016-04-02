@@ -35,9 +35,12 @@ expr_type ExprOne::get_type() const
 void ExprOne::print(std::ostream& out, int indentation,
 		const ExpressionOutputFlags& flags) const
 {
-	for (int i = 0; i < indentation; i++)
-		out << '\t';
-	out << '1' << '\n';
+	if (flags.indent)
+		for (int i = 0; i < indentation; i++)
+			out << '\t';
+	out << '1';
+	if (flags.indent)
+		out << '\n';
 }
 
 ExpressionRename* ExprOne::evaluate(const Dictionary& dictionary) const

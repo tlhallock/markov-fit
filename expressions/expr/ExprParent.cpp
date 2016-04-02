@@ -13,11 +13,12 @@ ExpressionRename* ExprParent::simplify(const SimplificationRules& rules)
 	if (children.size() == 1)
 		return children.front()->clone();
 
-	//		if (children.size() == 0)
-	//			return none();
-	auto end = children.end();
-	for (auto it = children.begin(); it != end; ++it)
-		children.insert(children.erase(it), expr_simplify(*it, rules));
+	std::list<ExpressionRename*> copy{children};
+	children.clear();
+
+	auto end = copy.end();
+	for (auto it = copy.begin(); it != end; ++it)
+		children.push_back(expr_simplify(*it, rules));
 	return this;
 }
 
@@ -88,3 +89,26 @@ ExprParent::~ExprParent()
 		delete *it;
 	}
 }
+
+void ExprParent::collapse()
+{
+	expr_type ttype = get_type();
+	const auto end = children.end();
+	auto it = children.begin();
+	while (it != end)
+	{
+		expr_type otype = (*it)->get_type();
+		if (otype != ttype)
+		{
+			++it;
+			continue;
+		}
+
+		ExprParent* child = (ExprParent*) ((*it));
+
+		children.splice(it, child->get_children());
+		children.erase(it++);
+		delete child;
+	}
+}
+

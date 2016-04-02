@@ -18,6 +18,8 @@ private:
 protected:
 	std::list<ExpressionRename *> children;
 
+	void collapse();
+
 public:
 	ExprParent(char c);
 	virtual ~ExprParent();

@@ -37,6 +37,7 @@ expr_type ExprMultiply::get_type() const
 	return EXPRESSION_TYPE_MULTIPLICATION;
 }
 
+#include <fstream>
 ExpressionRename* ExprMultiply::simplify(const SimplificationRules& rules)
 {
 	if (children.size() == 1)
@@ -45,30 +46,23 @@ ExpressionRename* ExprMultiply::simplify(const SimplificationRules& rules)
 	//		if (children.size() == 0)
 	//			return none();
 	ExprParent::simplify(rules);
+	ExprParent::collapse();
+
 	const auto end = children.end();
 	auto it = children.begin();
 	while (it != end)
 	{
-		expr_type t = (*it)->get_type();
-//		if (t == EXPRESSION_TYPE_MULTIPLICATION)
-//		{
-//			ExprMultiply* child = (ExprMultiply*) ((*it));
-//			children.splice(it, child->get_children());
-//			++it;
-//			children.erase(it);
-//			delete child;
-//		} else
-			if (t == EXPRESSION_TYPE_ZERO)
+		ExpressionRename *child;
+		switch ((*it)->get_type())
 		{
-			return new ExprZero { };
-		} else if (t == EXPRESSION_TYPE_ONE)
-		{
-			ExprMultiply* child = (ExprMultiply*) ((*it));
-			++it;
-			children.erase(it);
+		case EXPRESSION_TYPE_ZERO:
+			return new ExprZero{};
+		case EXPRESSION_TYPE_ONE:
+			child = (*it);
+			children.erase(it++);
 			delete child;
-		} else
-		{
+			break;
+		default:
 			++it;
 		}
 	}

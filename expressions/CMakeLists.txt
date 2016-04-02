@@ -20,8 +20,8 @@ FILE(GLOB expr_src expr/*.cpp)
 
 add_library(expr ${expr_src})
 
-add_executable(TestExpr test.cpp)
+add_executable(TestExpr test.cpp ${expr_src})
 
-target_link_libraries(TestExpr expr)
+#target_link_libraries(TestExpr expr)
 
 

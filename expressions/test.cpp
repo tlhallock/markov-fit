@@ -14,14 +14,20 @@ int main(int argc, char **argv)
 	ExpressionRename *three = new ExprValue{3};
 	ExpressionRename *var = new ExprVariable{0};
 	ExpressionRename *two = new ExprValue{2};
+	ExpressionRename *one = new ExprOne{};
 
-	ExpressionRename *mult = new ExprMultiply{three, var};
-	ExpressionRename *expr = new ExprMultiply{mult, two};
+	ExpressionRename *mult1 = new ExprMultiply{three, one};
+	ExpressionRename *mult2 = new ExprMultiply{mult1, var};
+	ExpressionRename *expr = new ExprMultiply{mult2, two};
+
+
 
 	expr->print(std::cout, 0);
+	std::cout << std::endl;
 
 	expr = expr_simplify(expr);
 
+	expr->print(std::cout, 0);
 	std::cout << std::endl;
 
 
