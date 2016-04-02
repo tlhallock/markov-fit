@@ -22,11 +22,14 @@ add_library(markov markov/mexp.cpp markov/generator.cpp markov/markov_chain.cpp 
 add_library(stats stats/cdf.cpp)
 add_library(local local/local_search_params.cpp local/local_search.cpp)
 
+add_library(expr expr/Dictionary.cpp expr/ExpressionRename.cpp)
+
+add_executable(TestExpr expr/test.cpp)
+target_link_libraries(TestExpr expr)
+
 
 
 add_executable(TestDirect test.cpp )
-
-
 
 target_link_libraries(TestDirect stats)
 target_link_libraries(TestDirect local)
