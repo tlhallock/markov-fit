@@ -18,7 +18,7 @@ set (TestDirect_VERSION_MINOR 0)
 include_directories(${PROJECT_SOURCE_DIR} /usr/include/gsl/)
 
 add_library(ransample alias/ransampl.c)
-add_library(markov markov/mexp.cpp markov/generator.cpp markov/markov.cpp markov/args.cpp) 
+add_library(markov markov/mexp.cpp markov/generator.cpp markov/markov_chain.cpp markov/markov_simulator.cpp) 
 add_library(stats stats/cdf.cpp)
 add_library(local local/local_search_params.cpp local/local_search.cpp)
 

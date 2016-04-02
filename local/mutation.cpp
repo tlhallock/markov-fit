@@ -60,6 +60,6 @@ void Mutation::cross(Mutation& m)
 {
 }
 
-void Mutation::apply(const Markov& original, Markov& out) const
+void Mutation::apply(const MarkovSimulator& original, MarkovSimulator& out) const
 {
 }

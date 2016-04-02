@@ -18,7 +18,7 @@
 
 
 
-void local_search(Markov& original, Markov& result, LocalGeneticSearchParams& params)
+void local_search(MarkovSimulator& original, MarkovSimulator& result, LocalGeneticSearchParams& params)
 {
 //	Generator ** pop = new Generator*[params.get_pop_size()];
 //	for (int i=0;i<params.get_pop_size(); i++)
@@ -47,7 +47,7 @@ void local_search(Markov& original, Markov& result, LocalGeneticSearchParams& pa
 }
 
 
-void local_search_simple_expm(const SummedCdf& desired, Args& chain, int maxiters, double tol)
+void local_search_simple_expm(const SummedCdf& desired, MarkovChain& chain, int maxiters, double tol)
 {
 	const double TOLERANCE = 1e-3;
 
@@ -69,7 +69,7 @@ void local_search_simple_expm(const SummedCdf& desired, Args& chain, int maxiter
 	set_cdf(gen_optimal, cdf_optimal, context);
 
 
-	Args test_chain{chain.get_size()};
+	MarkovChain test_chain{chain.get_size()};
 
 	int improvement_count = 0;
 	double current_distance = 1.0;
@@ -140,7 +140,7 @@ void local_search_simple_expm(const SummedCdf& desired, Args& chain, int maxiter
 }
 
 
-void local_search_simple_sim(Cdf& desired, Args& args, int maxiters, double tol)
+void local_search_simple_sim(Cdf& desired, MarkovChain& args, int maxiters, double tol)
 {
 	const double TOLERANCE = 1e-3;
 
@@ -153,13 +153,13 @@ void local_search_simple_sim(Cdf& desired, Args& args, int maxiters, double tol)
 	Cdf cdf_current{desired};
 	Cdf cdf_tmp{desired};
 
-	Markov simulator{args};
+	MarkovSimulator simulator{args};
 	simulator.simulate(cdf_optimal, cdf_tmp, TOLERANCE, gen, unif);
 
 	Generator gen_optimal{args};
 	Generator gen_current{args.get_size()};
 
-	Args test_chain{args.get_size()};
+	MarkovChain test_chain{args.get_size()};
 
 	int improvement_count = 0;
 	double current_distance = 1.0;

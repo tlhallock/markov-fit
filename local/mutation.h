@@ -8,9 +8,9 @@
 #ifndef LOCAL_MUTATION_H_
 #define LOCAL_MUTATION_H_
 
-#include "markov/markov.h"
-
 #include <random>
+
+#include "../markov/markov_simulator.h"
 
 class Mutation
 {
@@ -33,7 +33,7 @@ public:
 
 
 	void cross(Mutation& m);
-	void apply(const Markov& original, Markov& out) const;
+	void apply(const MarkovSimulator& original, MarkovSimulator& out) const;
 };
 
 #endif /* LOCAL_MUTATION_H_ */

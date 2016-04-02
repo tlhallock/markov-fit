@@ -2,7 +2,7 @@
 #ifndef ARGS_H_
 #define ARGS_H_
 
-class Args
+class MarkovChain
 {
  private:
   int n;
@@ -10,11 +10,11 @@ class Args
   double *lambdas;
   
  public:
-  Args(int n);
-  Args(const char *filename);
-  ~Args();
+  MarkovChain(int n);
+  MarkovChain(const char *filename);
+  ~MarkovChain();
 
-  Args& operator=(const Args& other);
+  MarkovChain& operator=(const MarkovChain& other);
 
   bool feasible() const;
   void normalize();

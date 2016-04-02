@@ -3,13 +3,14 @@
 #define MARKOV_H_
 
 #include "alias/ransampl.h"
-#include "markov/args.h"
 #include "stats/cdf.h"
 
 #include <random>
 
+#include "markov_chain.h"
 
-class Markov
+
+class MarkovSimulator
 {
 private:
 	int nstates;
@@ -17,10 +18,10 @@ private:
 	double *lambdas;
 
 public:
-	Markov(const Args& args);
-	~Markov();
+	MarkovSimulator(const MarkovChain& args);
+	~MarkovSimulator();
 
-	Markov& operator=(const Args& args);
+	MarkovSimulator& operator=(const MarkovChain& args);
 
 	void sample(Cdf& cdf, int ntimes) { sample(cdf, 0, nstates-1, ntimes); }
 	void sample(Cdf& cdf, int initialState, int hittingState, int ntimes);

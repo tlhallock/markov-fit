@@ -35,7 +35,7 @@ Generator::Generator(const char *filename)
 
 
 
-Generator::Generator(const Args& markov) :
+Generator::Generator(const MarkovChain& markov) :
 		n{markov.get_size()},
 		probs{new double[n*n]}
 
@@ -61,7 +61,7 @@ Generator::Generator(const Args& markov) :
 /**
  * Doesn't handle non-communicating states...
  */
-void Generator::assign(Args& markov) const
+void Generator::assign(MarkovChain& markov) const
 {
 	for (int r=0;r<n;r++)
 	{

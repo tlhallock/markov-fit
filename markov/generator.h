@@ -2,8 +2,9 @@
 #ifndef GENERATOR_H_
 #define GENERATOR_H_
 
-#include "markov/args.h"
 #include <random>
+
+#include "markov_chain.h"
 
 class Generator
 {   
@@ -16,7 +17,7 @@ class Generator
  public:
 	Generator(int n);
 	Generator(const char *filename);
-	Generator(const Args& markov);
+	Generator(const MarkovChain& markov);
 
 	~Generator();
 
@@ -32,7 +33,7 @@ class Generator
 	void write(const char *filename);
 	void writeMatlab(const char *filename);
 
-	void assign(Args& markov) const;
+	void assign(MarkovChain& markov) const;
 
 
 

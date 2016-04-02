@@ -7,9 +7,9 @@
 
 
 
-#include "markov/markov.h"
 #include "local/local_search.h"
 #include "markov/generator.h"
+#include "markov/markov_simulator.h"
 
 
 static void testDiff()
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 	unif->print("output/unif_plot.m", "unif");
 
 
-	Args args{3};
+	MarkovChain args{3};
 	args.randomize(2);
 
 	SummedCdf cdf{unif->getCdf().bounds()};

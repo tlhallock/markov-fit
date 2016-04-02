@@ -1,5 +1,5 @@
 
-#include "markov/markov.h"
+#include "markov_simulator.h"
 
 #include "constants.h"
 
@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <iostream>
 
-Markov::Markov(const Args& args) :
+MarkovSimulator::MarkovSimulator(const MarkovChain& args) :
   nstates{args.get_size()},
   comps{(ransampl_ws **) malloc (args.get_size() * sizeof (*comps))},
   lambdas{new double[args.get_size()]}
@@ -22,7 +22,7 @@ Markov::Markov(const Args& args) :
   }
 
 
-Markov::~Markov()
+MarkovSimulator::~MarkovSimulator()
 {
   for (int i=0;i<nstates;i++)
     {
@@ -32,7 +32,7 @@ Markov::~Markov()
   delete[] lambdas;
 }
 
- void Markov::sample(Cdf& cdf, int initialState, int hittingState, int ntimes)
+ void MarkovSimulator::sample(Cdf& cdf, int initialState, int hittingState, int ntimes)
  {
    std::random_device rd;
    std::mt19937 gen(rd());
@@ -54,7 +54,7 @@ Markov::~Markov()
  }
  
 #define ITERATIONS 1000
-double Markov::simulate(
+double MarkovSimulator::simulate(
 		Cdf& cdf,
 		Cdf& tmp,
 		double tol,
@@ -90,7 +90,7 @@ double Markov::simulate(
 	return diff;
 }
 
-Markov& Markov::operator =(const Args& args)
+MarkovSimulator& MarkovSimulator::operator =(const MarkovChain& args)
 {
 	if (nstates != args.get_size())
 		throw SIZE_MISMATCH_IN_MARKOV_ASSIGN;

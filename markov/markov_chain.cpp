@@ -1,5 +1,5 @@
 
-#include "markov/args.h"
+#include "markov_chain.h"
 
 #include "constants.h"
 
@@ -9,7 +9,7 @@
 
 
 
-Args::Args(int n) :
+MarkovChain::MarkovChain(int n) :
   n{n},
   probs{new double[n*n]},
   lambdas{new double[n]}
@@ -18,7 +18,7 @@ Args::Args(int n) :
         throw ARGUMENT_INIT_ERROR;
   }
 
-Args::Args(const char *filename)
+MarkovChain::MarkovChain(const char *filename)
 {
 	n = 0;
 	std::ifstream instr(filename);
@@ -33,18 +33,18 @@ Args::Args(const char *filename)
 	instr.close();
 }
 
-Args::~Args()
+MarkovChain::~MarkovChain()
 {
 	delete[] probs;
 	delete[] lambdas;
 }
 
-bool Args::feasible() const
+bool MarkovChain::feasible() const
 {
 	return false;
 }
 
-void Args::randomize(double wait)
+void MarkovChain::randomize(double wait)
 {
 	std::random_device rd;
 	std::mt19937 gen(rd());
@@ -67,7 +67,7 @@ void Args::randomize(double wait)
 	normalize();
 }
 
-void Args::normalize()
+void MarkovChain::normalize()
 {
 	for (int i = 0; i < n; i++)
 	{
@@ -83,7 +83,7 @@ void Args::normalize()
 	}
 }
 
-void Args::write(const char *filename)
+void MarkovChain::write(const char *filename)
 {
     std::ofstream outstr;
     outstr.open(filename);
@@ -107,7 +107,7 @@ void Args::write(const char *filename)
 
 }
 
-Args& Args::operator =(const Args& other)
+MarkovChain& MarkovChain::operator =(const MarkovChain& other)
 {
 	if (get_size() != other.get_size())
 		throw SIZE_MISMATCH_IN_MARKOV_ASSIGN;
