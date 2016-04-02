@@ -9,11 +9,11 @@
 #define EXPR_EXPRESSIONS_H_
 
 
-#include "ExprOne.h"
-#include "ExprZero.h"
-#include "ExprMultiply.h"
-#include "ExprValue.h"
-#include "ExprVariable.h"
+#include "expr/ExprOne.h"
+#include "expr/ExprZero.h"
+#include "expr/ExprMultiply.h"
+#include "expr/ExprValue.h"
+#include "expr/ExprVariable.h"
 
 
 

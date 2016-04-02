@@ -23,17 +23,6 @@ add_library(stats stats/cdf.cpp)
 add_library(local local/local_search_params.cpp local/local_search.cpp)
 
 
-
-FILE(GLOB expr_src expr/*.cpp)
-#message(STATUS )
-#list (REMOVE_ITEM exr_src expr/test.cpp)
-#add_library(expr ${expr_src})
-
-add_executable(TestExpr ${expr_src})
-#target_link_libraries(TestExpr expr)
-
-
-
 add_executable(TestDirect test.cpp )
 
 target_link_libraries(TestDirect stats)
