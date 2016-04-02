@@ -8,7 +8,7 @@
 #ifndef LOCAL_LOCAL_SEARCH_PARAMS_H_
 #define LOCAL_LOCAL_SEARCH_PARAMS_H_
 
-#include "cdf.h"
+#include "stats/cdf.h"
 
 class LocalGeneticSearchParams
 {

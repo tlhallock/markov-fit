@@ -7,9 +7,9 @@
 
 
 
-#include "markov.h"
+#include "markov/markov.h"
 #include "local/local_search.h"
-#include "generator.h"
+#include "markov/generator.h"
 
 
 static void testDiff()

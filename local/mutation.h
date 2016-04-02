@@ -8,7 +8,7 @@
 #ifndef LOCAL_MUTATION_H_
 #define LOCAL_MUTATION_H_
 
-#include "markov.h"
+#include "markov/markov.h"
 
 #include <random>
 

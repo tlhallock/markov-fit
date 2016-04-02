@@ -5,7 +5,7 @@
  *      Author: default
  */
 
-#include "mexp.h"
+#include "markov/mexp.h"
 
 #include "gsl_linalg.h"
 

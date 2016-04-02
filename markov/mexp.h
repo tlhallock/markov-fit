@@ -8,8 +8,8 @@
 #ifndef EXPM_MEXP_H_
 #define EXPM_MEXP_H_
 
-#include "generator.h"
-#include "cdf.h"
+#include "markov/generator.h"
+#include "stats/cdf.h"
 
 class GslContext
 {

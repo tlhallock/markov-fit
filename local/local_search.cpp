@@ -7,9 +7,9 @@
 
 
 #include "local/local_search.h"
-#include "generator.h"
 
-#include "expm/mexp.h"
+#include "markov/generator.h"
+#include "markov/mexp.h"
 
 #include <sstream>
 #include <iostream>

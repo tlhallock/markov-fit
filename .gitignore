@@ -33,5 +33,5 @@ CMakeFiles/
 cmake_install.cmake
 
 Test
-
+bin/
 output/

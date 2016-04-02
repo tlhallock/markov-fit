@@ -1,5 +1,5 @@
 
-#include "generator.h"
+#include "markov/generator.h"
 
 #include "constants.h"
 

@@ -1,5 +1,5 @@
 
-#include "cdf.h"
+#include "stats/cdf.h"
 #include "constants.h"
 
 #include <iomanip>

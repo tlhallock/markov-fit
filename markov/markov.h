@@ -3,8 +3,8 @@
 #define MARKOV_H_
 
 #include "alias/ransampl.h"
-#include "args.h"
-#include "cdf.h"
+#include "markov/args.h"
+#include "stats/cdf.h"
 
 #include <random>
 

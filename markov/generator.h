@@ -2,7 +2,7 @@
 #ifndef GENERATOR_H_
 #define GENERATOR_H_
 
-#include "args.h"
+#include "markov/args.h"
 #include <random>
 
 class Generator
