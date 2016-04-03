@@ -112,3 +112,15 @@ void ExprParent::collapse()
 	}
 }
 
+ExpressionRename* ExprParent::clone() const
+{
+	ExprParent *c = newOne();
+
+	const auto end = children.end();
+	for (auto it = children.begin(); it != end; ++it)
+	{
+		c->children.push_back((*it)->clone());
+	}
+
+	return c;
+}

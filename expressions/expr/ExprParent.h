@@ -19,11 +19,12 @@ protected:
 	std::list<ExpressionRename *> children;
 
 	void collapse();
-
+	virtual ExprParent *newOne() const = 0;
 public:
 	ExprParent(char c);
 	virtual ~ExprParent();
 
+	ExpressionRename *clone() const;
 
 	virtual ExpressionRename* simplify(const SimplificationRules& rules);
 

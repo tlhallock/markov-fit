@@ -22,9 +22,10 @@ ExprMultiply::~ExprMultiply()
 {
 }
 
-ExpressionRename* ExprMultiply::clone() const
+
+ExprParent* ExprAddition::newOne() const
 {
-	throw 2;
+	return new ExprMultiply{};
 }
 
 ExpressionRename* ExprMultiply::differentiate(const int variable) const
@@ -37,7 +38,6 @@ expr_type ExprMultiply::get_type() const
 	return EXPRESSION_TYPE_MULTIPLICATION;
 }
 
-#include <fstream>
 ExpressionRename* ExprMultiply::simplify(const SimplificationRules& rules)
 {
 	if (children.size() == 1)

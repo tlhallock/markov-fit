@@ -12,9 +12,20 @@
 
 class ExprAddition: public ExprParent
 {
-public:
+private:
 	ExprAddition();
+
+protected:
+	ExprParent *newOne() const;
+
+public:
+	ExprAddition(ExpressionRename* l, ExpressionRename* r);
 	virtual ~ExprAddition();
+
+	ExpressionRename* differentiate(const int variable) const;
+	expr_type get_type() const;
+	ExpressionRename* simplify(const SimplificationRules& rules);
+	ExpressionRename* evaluate(const Dictionary& dictionary) const;
 };
 
 #endif /* EXPR_EXPRADDITION_H_ */
