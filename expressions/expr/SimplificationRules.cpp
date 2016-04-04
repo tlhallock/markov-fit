@@ -7,12 +7,8 @@
 
 #include "SimplificationRules.h"
 
-SimplificationRules::SimplificationRules()
-{
+SimplificationRules::SimplificationRules() :
+	simplify_matrix_multiplication{false},
+	simplify_exponentian{false} {}
 
-}
-
-SimplificationRules::~SimplificationRules()
-{
-}
-
+SimplificationRules::~SimplificationRules() {}

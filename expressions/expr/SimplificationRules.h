@@ -11,6 +11,9 @@
 class SimplificationRules
 {
 public:
+	bool simplify_matrix_multiplication;
+	bool simplify_exponentian;
+
 	SimplificationRules();
 	virtual ~SimplificationRules();
 };

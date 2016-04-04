@@ -7,36 +7,98 @@
 
 #include <iostream>
 #include <list>
+#include <algorithm>
+#include <iterator>
+
 #include "expressions.h"
+#include "parsers/parser.h"
+
+
+bool pred(int i)
+{
+	return i >= 3;
+}
+void pri(int i)
+{
+	std::cout << i << " ";
+}
 
 int main(int argc, char **argv)
 {
-	ExpressionRename *three = new ExprValue{3};
-	ExpressionRename *var = new ExprVariable{0};
-	ExpressionRename *two = new ExprValue{2};
-	ExpressionRename *one = new ExprOne{};
-
-	ExpressionRename *mult1 = new ExprMultiply{three, one};
-	ExpressionRename *mult2 = new ExprMultiply{mult1, var};
-	ExpressionRename *expr = new ExprMultiply{mult2, two};
-
-
+	ExpressionRename *expr = parse("test.txt");
+	if (expr == nullptr)
+	{
+		std::cout << "No expression found." << std::endl;
+		return 0;
+	}
 
 	expr->print(std::cout, 0);
 	std::cout << std::endl;
-
-	expr = expr_simplify(expr);
-
-	expr->print(std::cout, 0);
-	std::cout << std::endl;
-
 
 	delete expr;
-
-
-
-	return 0;
 }
+
+
+//
+//ExpressionRename *three = new ExprValue{3};
+//ExpressionRename *var = new ExprVariable{0};
+//ExpressionRename *two = new ExprValue{2};
+//ExpressionRename *one = new ExprOne{};
+//
+//ExpressionRename *mult1 = new ExprMultiply{three, one};
+//ExpressionRename *mult2 = new ExprMultiply{mult1, var};
+//ExpressionRename *expr = new ExprMultiply{mult2, two};
+//
+//
+//
+//expr->print(std::cout, 0);
+//std::cout << std::endl;
+//
+//expr = expr_simplify(expr);
+//
+//expr->print(std::cout, 0);
+//std::cout << std::endl;
+//
+//
+//delete expr;
+//
+//
+//
+//return 0;
+
+
+
+
+
+
+
+
+
+
+//	std::list<int> l1;
+//	l1.push_back(1);
+//	l1.push_back(2);
+//	l1.push_back(3);
+//	l1.push_back(4);
+//	l1.push_back(5);
+//	l1.push_back(6);
+//
+//	std::list<int> l2;
+//
+////	std::remove_copy_if(l1.begin(), l1.end(), std::inserter{l2, std::next{l2.begin()}}, pred);
+//	move_if(l1, std::back_insert_iterator<std::list<int> >{l2}, pred);
+//
+//	std::for_each(l1.begin(), l1.end(), pri);
+//	std::cout << std::endl;
+//	std::for_each(l2.begin(), l2.end(), pri);
+//	std::cout << std::endl;
+//
+//	if (1) return 0;
+//
+//
+//
+
+
 
 //
 //

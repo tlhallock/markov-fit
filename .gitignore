@@ -27,11 +27,18 @@
 *.out
 *.app
 
-Makefile
+./Makefile
+expressions/Makefile
+objective/Makefile
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
-
+old/
 Test
 bin/
 output/
+
+expressions/parsers/calc.tab.c
+expressions/parsers/calc.tab.cpp
+expressions/parsers/calc.tab.h
+expressions/parsers/lex.yy.c

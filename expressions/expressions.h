@@ -18,7 +18,7 @@
 #include "expr/ExprZero.h"
 
 #include "expr/ExprVariable.h"
-
+#include "expr/ExprPower.h"
 #include "expr/ExprNegation.h"
 
 
