@@ -14,14 +14,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set (TestDirect_VERSION_MAJOR 1)
 set (TestDirect_VERSION_MINOR 0)
 
+#FILE(GLOB parsersrc parsers/error.cpp parsers/functions.cpp parsers/variablelist.cpp parsers/parser.cpp)
+#add_executable(TestParser parsers/main.cpp ${parsersrc})
+
+
 
 
 FILE(GLOB expr_src expr/*.cpp)
 
-add_library(expr ${expr_src})
+#add_library(expr ${expr_src})
 
 add_executable(TestExpr test.cpp ${expr_src})
 
 #target_link_libraries(TestExpr expr)
+
 
 

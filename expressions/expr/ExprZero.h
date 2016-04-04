@@ -24,6 +24,7 @@ public:
 
 	virtual void print(std::ostream& out, int indentation,
 			const ExpressionOutputFlags& flags) const;
+	bool contains_variable(int variable) const;
 };
 
 

@@ -10,6 +10,7 @@
 
 ExpressionRename* ExprParent::simplify(const SimplificationRules& rules)
 {
+	// use <algorithm>
 	if (children.size() == 1)
 		return children.front()->clone();
 
@@ -25,7 +26,15 @@ ExpressionRename* ExprParent::simplify(const SimplificationRules& rules)
 ExpressionRename* ExprParent::evaluate(
 		const Dictionary& dictionary) const
 {
-	return clone();
+	// use <algorithm>
+
+	ExprParent *returnValue = newOne();
+
+	const auto end = children.end();
+	for (auto it = children.begin(); it != end; ++it)
+		returnValue->children.push_back((*it)->evaluate(dictionary));
+
+	return returnValue;
 }
 
 void ExprParent::print(std::ostream& out, int indentation,
@@ -116,6 +125,9 @@ ExpressionRename* ExprParent::clone() const
 {
 	ExprParent *c = newOne();
 
+
+	// should be std::transform...
+
 	const auto end = children.end();
 	for (auto it = children.begin(); it != end; ++it)
 	{
@@ -123,4 +135,15 @@ ExpressionRename* ExprParent::clone() const
 	}
 
 	return c;
+}
+
+bool ExprParent::contains_variable(int variable) const
+{
+	const auto end = children.end();
+	for (auto it = children.begin(); it != end; ++it)
+	{
+		if ((*it)->contains_variable(variable))
+			return true;
+	}
+	return false;
 }

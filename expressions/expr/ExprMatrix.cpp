@@ -7,6 +7,10 @@
 
 #include "ExprMatrix.h"
 
+#include "ExprZero.h"
+#include "ExprAddition.h"
+#include "ExprMultiply.h"
+
 ExprMatrix::ExprMatrix(int m, int n) :
 	m{m},
 	n{n},
@@ -24,6 +28,10 @@ ExprMatrix::~ExprMatrix()
 }
 
 ExpressionRename* ExprMatrix::get(int i, int j)
+{
+	return elems[i * n + j];
+}
+const ExpressionRename* ExprMatrix::get(int i, int j) const
 {
 	return elems[i * n + j];
 }
@@ -121,4 +129,53 @@ void ExprMatrix::print(std::ostream& out, int indentation,
 
 
 	out << "]";
+}
+
+ExprMatrix *expr_matrix_simplify_sum(const std::list<ExpressionRename *>& list)
+{
+	bool is_matrix = list.front()->get_type() == EXPRESSION_TYPE_MATRIX;
+	if (!is_matrix)
+	{
+		throw 3;
+	}
+
+	int m = ((ExprMatrix *) list.front())->get_m();
+	int n = ((ExprMatrix *) list.front())->get_n();
+
+	ExprMatrix *matrix = new ExprMatrix { m, n };
+	for (int i = 0; i < m * n; i++)
+		matrix->elems[i] = new ExprAddition { };
+
+	const auto end = list.end();
+	for (auto it = list.begin(); it != end; ++it)
+	{
+		if ((*it)->get_type() != EXPRESSION_TYPE_MATRIX)
+			throw 1;
+
+		ExprMatrix *mat = (ExprMatrix *) (*it);
+		if (mat->get_m() != m || mat->get_n() != n)
+			throw 2;
+
+		for (int i = 0; i < m * n; i++)
+			((ExprAddition *) matrix->elems[i])->add(mat->elems[i]->clone());
+	}
+	if (m != 1 || n != 1)
+		return (ExprMatrix *) expr_simplify(matrix);
+	return matrix;
+}
+
+bool ExprMatrix::contains_variable(int variable) const
+{
+	for (int i=0;i<m*n;i++)
+		if (elems[i]->contains_variable(variable))
+			return true;
+	return false;
+}
+
+ExpressionRename* ExprMatrix::to_expr() const
+{
+	if (m != 1 || n != 1)
+		throw -1;
+
+	return elems[0]->clone();
 }

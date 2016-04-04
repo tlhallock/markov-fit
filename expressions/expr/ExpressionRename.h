@@ -23,6 +23,9 @@ typedef enum
 	EXPRESSION_TYPE_VALUE,
 	EXPRESSION_TYPE_VARIABLE,
 
+	EXPRESSION_TYPE_NEGATION,
+	EXPRESSION_TYPE_POWER,
+
 	EXPRESSION_TYPE_ADDITION,
 	EXPRESSION_TYPE_SUBTRACTION,
 	EXPRESSION_TYPE_MULTIPLICATION,
@@ -73,6 +76,7 @@ public:
 	 */
 	virtual void print(std::ostream& out, int indentation, const ExpressionOutputFlags& flags = ExpressionOutputFlags{}) const = 0;
 
+	virtual bool contains_variable(int variable) const = 0;
 };
 
 /**

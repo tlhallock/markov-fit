@@ -44,3 +44,8 @@ void ExprZero::print(std::ostream& out, int indentation,
 		out << '\t';
 	out << '0' << '\n';
 }
+
+bool ExprZero::contains_variable(int variable) const
+{
+	return false;
+}

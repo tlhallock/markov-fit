@@ -12,15 +12,18 @@
 
 class ExprAddition: public ExprParent
 {
-private:
-	ExprAddition();
-
 protected:
 	ExprParent *newOne() const;
 
 public:
+	ExprAddition();
 	ExprAddition(ExpressionRename* l, ExpressionRename* r);
 	virtual ~ExprAddition();
+
+	/**
+	 * Modifies the current expression to also have the new term at the end.
+	 */
+	void add(ExpressionRename *expr);
 
 	ExpressionRename* differentiate(const int variable) const;
 	expr_type get_type() const;

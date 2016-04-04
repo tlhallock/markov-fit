@@ -11,12 +11,16 @@
 #include "ExprParent.h"
 
 class ExprMultiply : public ExprParent {
-protected:
 
+protected:
 	ExprParent* newOne() const;
+
 public:
+	ExprMultiply();
 	ExprMultiply(ExpressionRename* l, ExpressionRename* r);
 	virtual ~ExprMultiply();
+
+	void multiply(ExpressionRename *factor);
 
 	ExpressionRename* differentiate(const int variable) const;
 	expr_type get_type() const;

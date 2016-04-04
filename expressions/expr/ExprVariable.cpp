@@ -61,3 +61,8 @@ void ExprVariable::print(std::ostream& out, int indentation,
 	if (flags.indent)
 		out << '\n';
 }
+
+bool ExprVariable::contains_variable(int variable) const
+{
+	return index == variable;
+}

@@ -47,3 +47,8 @@ ExpressionRename* ExprOne::evaluate(const Dictionary& dictionary) const
 {
 	return new ExprValue { 1 };
 }
+
+bool ExprOne::contains_variable(int variable) const
+{
+	return false;
+}

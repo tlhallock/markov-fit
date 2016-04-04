@@ -24,6 +24,7 @@ public:
 			const ExpressionOutputFlags& flags) const;
 
 	ExpressionRename* evaluate(const Dictionary& dictionary) const;
+	bool contains_variable(int variable) const;
 };
 
 

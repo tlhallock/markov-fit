@@ -7,6 +7,8 @@
 
 #include "ExpressionRename.h"
 
+#include "ExprMatrix.h"
+
 ExpressionRename::ExpressionRename()
 {
 }
@@ -24,6 +26,16 @@ ExpressionRename* expr_simplify(ExpressionRename* rename, const SimplificationRu
 {
 	while (true)
 	{
+		if (rename->get_type() == EXPRESSION_TYPE_MATRIX)
+		{
+			ExprMatrix *matrix = (ExprMatrix *) rename;
+			if (matrix->get_m() == 1 && matrix->get_n() == 1)
+			{
+				rename = matrix->to_expr();
+				delete matrix;
+			}
+		}
+
 		ExpressionRename* simplified = rename->simplify(rules);
 		if (simplified == rename)
 			return rename;

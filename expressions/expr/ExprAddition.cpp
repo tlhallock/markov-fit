@@ -7,13 +7,22 @@
 
 #include "ExprAddition.h"
 
-ExprAddition::ExprAddition(ExpressionRename* l, ExpressionRename* r)
+#include "../util.h"
+
+#include "ExprMatrix.h"
+#include "ExprValue.h"
+
+#include <algorithm>
+
+ExprAddition::ExprAddition(ExpressionRename* l, ExpressionRename* r) :
+	ExprParent{'+'}
 {
 	children.push_back(l);
 	children.push_back(r);
 }
 
-ExprAddition::ExprAddition()
+ExprAddition::ExprAddition() :
+	ExprParent{'+'}
 {
 }
 
@@ -52,17 +61,30 @@ ExpressionRename* ExprAddition::simplify(const SimplificationRules& rules)
 	ExprParent::simplify(rules);
 	ExprParent::collapse();
 
+	bool is_matrix = children.front()->get_type() == EXPRESSION_TYPE_MATRIX;
+	if (is_matrix)
+	{
+		return expr_matrix_simplify_sum(children);
+	}
+
 	const auto end = children.end();
 	auto it = children.begin();
 	while (it != end)
 	{
 		ExpressionRename *child;
+		ExprMatrix *mat;
 		switch ((*it)->get_type())
 		{
 		case EXPRESSION_TYPE_ZERO:
 			child = (*it);
 			children.erase(it++);
 			delete child;
+			break;
+		case EXPRESSION_TYPE_MATRIX:
+			mat = (ExprMatrix *)(*it);
+			children.erase(it++);
+			children.insert(it, expr_simplify(mat->to_expr()));
+			delete mat;
 			break;
 		default:
 			++it;
@@ -76,40 +98,89 @@ ExprParent* ExprAddition::newOne() const
 	return new ExprAddition{};
 }
 
+void ExprAddition::add(ExpressionRename* expr)
+{
+	children.push_back(expr);
+}
+
+bool expr_add_is_value(const ExpressionRename* expr)
+{
+	return expr->get_type() == EXPRESSION_TYPE_VALUE;
+}
+
 ExpressionRename* ExprAddition::evaluate(const Dictionary& dictionary) const
 {
-	bool is_matrix = children.front()->get_type() == EXPRESSION_TYPE_MATRIX;
-	if (is_matrix)
-	{
-		int m = ((ExprMatrix *)children.front())->get_m();
-		int n = ((ExprMatrix *)children.front())->get_n();
+	ExprAddition* addition = (ExprAddition *) ExprParent::evaluate(dictionary);
 
-		const auto end = children.end();
-		for (auto it = children.begin(); it != end; ++it)
+	bool removed = false;
+	double value = 0.0;
+	const auto end = addition->children.end();
+	auto it = addition->children.begin();
+
+	while (it != end)
+	{
+		if ((*it)->get_type() != EXPRESSION_TYPE_VALUE)
 		{
-			if ((*it)->get_type() != EXPRESSION_TYPE_MATRIX)
-			{
-				throw 1;
-			}
-
-			ExprMatrix *mat = (ExprMatrix *) (*it);
-			if (mat->get_m() != m || mat->get_n() != n)
-			{
-				throw 2;
-			}
+			it++;
+			continue;
 		}
+
+		ExprValue *valexpr = (ExprValue *) (*it);
+		removed = true;
+		addition->children.erase(it++);
+		value += valexpr->get_value();
+		delete valexpr;
 	}
 
-	if (is_matrix)
+	if (removed)
 	{
-	}
-	else
-	{
-		const auto end = children.end();
-		for (auto it = children.begin(); it != end; ++it)
-		{
-		}
+		if (addition->children.empty())
+			return new ExprValue { value };
+
+		addition->children.push_front(new ExprValue { value });
 	}
 
-	return nullptr;
+	return addition;
 }
+
+
+
+
+
+
+
+
+
+//
+//
+//move_if(children, std::back_insert_iterator<std::list<int>>{list}, expr_add_is_value);
+//
+//
+////
+////	children.remove_if(expr_add_is_value);
+////
+////	remove_copy_if
+//
+//const auto end = children.end();
+//auto it = children.begin();
+//while (it != end)
+//{
+//	ExpressionRename *child;
+//	ExprMatrix *mat;
+//	switch ((*it)->get_type())
+//	{
+//	case EXPRESSION_TYPE_ZERO:
+//		child = (*it);
+//		children.erase(it++);
+//		delete child;
+//		break;
+//	case EXPRESSION_TYPE_MATRIX:
+//		mat = (ExprMatrix *)(*it);
+//		children.erase(it++);
+//		children.insert(it, expr_simplify(mat->to_expr()));
+//		delete mat;
+//		break;
+//	default:
+//		++it;
+//	}
+//}

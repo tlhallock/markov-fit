@@ -57,3 +57,13 @@ void ExprValue::print(std::ostream& out, int indentation,
 	if (flags.indent)
 		out << '\n';
 }
+
+void ExprValue::negate()
+{
+	value = -value;
+}
+
+bool ExprValue::contains_variable(int variable) const
+{
+	return false;
+}

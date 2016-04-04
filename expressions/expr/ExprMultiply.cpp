@@ -8,6 +8,8 @@
 #include "ExprMultiply.h"
 
 #include "ExprZero.h"
+#include "ExprAddition.h"
+#include "ExprValue.h"
 //#include "ExprOne.h"
 
 
@@ -18,12 +20,16 @@ ExprMultiply::ExprMultiply(ExpressionRename* l, ExpressionRename* r) :
 	children.push_back(r);
 }
 
-ExprMultiply::~ExprMultiply()
+ExprMultiply::ExprMultiply() :
+	ExprParent{'*'}
 {
 }
 
 
-ExprParent* ExprAddition::newOne() const
+ExprMultiply::~ExprMultiply() {}
+
+
+ExprParent* ExprMultiply::newOne() const
 {
 	return new ExprMultiply{};
 }
@@ -69,8 +75,43 @@ ExpressionRename* ExprMultiply::simplify(const SimplificationRules& rules)
 	return this;
 }
 
+void ExprMultiply::multiply(ExpressionRename* factor)
+{
+	children.push_back(factor);
+}
+
 ExpressionRename* ExprMultiply::evaluate(
 		const Dictionary& dictionary) const
 {
-	ExprParent::evaluate(dictionary);
+	ExprMultiply* multiplication = (ExprMultiply *) ExprParent::evaluate(dictionary);
+
+	bool removed = false;
+	double value = 1.0;
+	const auto end = multiplication->children.end();
+	auto it = multiplication->children.begin();
+
+	while (it != end)
+	{
+		if ((*it)->get_type() != EXPRESSION_TYPE_VALUE)
+		{
+			it++;
+			continue;
+		}
+
+		ExprValue *valexpr = (ExprValue *) (*it);
+		removed = true;
+		multiplication->children.erase(it++);
+		value *= valexpr->get_value();
+		delete valexpr;
+	}
+
+	if (removed)
+	{
+		if (multiplication->children.empty())
+			return new ExprValue { value };
+
+		multiplication->children.push_front(new ExprValue { value });
+	}
+
+	return multiplication;
 }
