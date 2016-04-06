@@ -24,7 +24,9 @@ public:
 
 	ExpressionRename* simplify(const SimplificationRules& rules);
 
-	ExpressionRename* evaluate(const Dictionary& dictionary) const;
+	ExpressionRename* substitute(const Dictionary& dictionary) const;
+
+	Result *evaluate() const { throw 1; }
 
 	void print(std::ostream& out, int indentation,
 			const ExpressionOutputFlags& flags) const;

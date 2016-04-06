@@ -70,10 +70,10 @@ ExpressionRename* ExprPower::simplify(const SimplificationRules& rules)
 	return this;
 }
 
-ExpressionRename* ExprPower::evaluate(const Dictionary& dictionary) const
+ExpressionRename* ExprPower::substitute(const Dictionary& dictionary) const
 {
-	ExpressionRename *p = power->evaluate(dictionary);
-	ExpressionRename *b = base->evaluate(dictionary);
+	ExpressionRename *p = power->substitute(dictionary);
+	ExpressionRename *b = base->substitute(dictionary);
 
 	if (p->get_type() == EXPRESSION_TYPE_ONE)
 	{
@@ -105,6 +105,56 @@ void ExprPower::print(std::ostream& out, int indentation,
 	out << ")^(";
 	power->print(out, indentation+1, flags);
 	out << ")";
+}
+
+Result* ExprPower::evaluate() const
+{
+	Result *b =  base->evaluate();
+	Result *p = power->evaluate();
+	if (b->is_scalar() && p->is_scalar())
+	{
+		b->set(0, 0, std::pow(b->value(0,0), p->value(0, 0)));
+		delete p;
+		return b;
+	}
+
+	if (!p->is_scalar())
+		throw 1;
+
+	double d = p->value(0, 0); // TODO
+	delete p;
+
+	int n = b->rows();
+	if (n != b->cols())
+		throw 1;
+
+	Result *tmp = new Result { b };
+	Result *tmp2 = new Result { b->rows(), b->cols() };
+
+	// Dumb...
+	for (int t = 1; t < d; t++)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			for (int j = 0; j < n; j++)
+			{
+				double val = 0;
+
+				for (int k = 0; k < n; k++)
+					val += b->value(i, k)
+							* tmp->value(k, j);
+
+				tmp2->set(i, j, val);
+			}
+		}
+
+		(*b) = tmp2;
+	}
+
+	delete tmp;
+	delete tmp2;
+
+	return b;
 }
 
 bool ExprPower::contains_variable(int variable) const

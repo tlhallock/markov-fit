@@ -22,16 +22,18 @@ public:
 	double get_value() const { return value; }
 
 	ExpressionRename* clone() const { return new ExprValue{value}; }
+
 	ExpressionRename* differentiate(const int variable) const;
 
 	expr_type get_type() const;
 
-	virtual ExpressionRename* simplify(const SimplificationRules& rules);
+	ExpressionRename* simplify(const SimplificationRules& rules);
 
-	virtual ExpressionRename* evaluate(const Dictionary& dictionary) const;
+	ExpressionRename* substitute(const Dictionary& dictionary) const;
 
+	Result *evaluate() const;
 
-	virtual void print(std::ostream& out, int indentation,
+	void print(std::ostream& out, int indentation,
 			const ExpressionOutputFlags& flags) const;
 
 	bool contains_variable(int variable) const;

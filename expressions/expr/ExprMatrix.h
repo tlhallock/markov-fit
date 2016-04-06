@@ -32,20 +32,42 @@ public:
 	const ExpressionRename* get(int i, int j) const;
 	void set(int i, int j, ExpressionRename *expr);
 
-	ExpressionRename* multiply(const ExprMatrix* expr) const;
 
+
+
+	/** No block matrices right now... **/
+	Result *evaluate() const;
 	ExpressionRename* clone() const;
 	ExpressionRename* differentiate(const int variable) const;
 	expr_type get_type() const;
 	ExpressionRename* simplify(const SimplificationRules& rules);
-	ExpressionRename* evaluate(const Dictionary& dictionary) const;
+	ExpressionRename* substitute(const Dictionary& dictionary) const;
 	void print(std::ostream& out, int indentation, const ExpressionOutputFlags& flags = ExpressionOutputFlags{}) const;
 	bool contains_variable(int variable) const;
 
 	ExpressionRename* to_expr() const;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	ExprMatrix* multiply(const ExprMatrix* expr) const;
 };
 
 /** This should return an expression! **/
 ExprMatrix *expr_matrix_simplify_sum(const std::list<ExpressionRename *>& list);
+
+
+ExprMatrix *create_identity(int nrows);
+ExprMatrix *create_variable_matrix(int nrows);
 
 #endif /* EXPR_EXPRMATRIX_H_ */

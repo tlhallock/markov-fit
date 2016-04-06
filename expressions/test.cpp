@@ -25,17 +25,72 @@ void pri(int i)
 
 int main(int argc, char **argv)
 {
-	ExpressionRename *expr = parse("test.txt");
-	if (expr == nullptr)
-	{
-		std::cout << "No expression found." << std::endl;
-		return 0;
-	}
 
-	expr->print(std::cout, 0);
+	ExprMatrix *mat1 = create_identity(3);
+	mat1->set(0, 3, new ExprValue{-5});
+	ExprMatrix *vector = new ExprMatrix{3, 1};
+	vector->set(0, 0, new ExprVariable{0});
+	vector->set(1, 0, new ExprVariable{1});
+	vector->set(2, 0, new ExprVariable{0});
+
+	ExpressionRename *mult = new ExprMultiply{mat1, vector};
+
+	mult->print(std::cout, 0);
 	std::cout << std::endl;
 
-	delete expr;
+	SimplificationRules rules;
+	rules.simplify_matrix_multiplication = true;
+	mult = (ExprMatrix *) expr_simplify(mult, rules);
+
+	mult->print(std::cout, 0);
+	std::cout << std::endl;
+
+
+	Dictionary d{2};
+	d.put(0, ExprValue{3});
+	d.put(1, ExprValue{6});
+
+	ExpressionRename *subs = mult->substitute(d);
+
+	subs->print(std::cout, 0);
+	std::cout << std::endl;
+
+
+
+	Result *res = subs->evaluate();
+	res->print(std::cout);
+	std::cout << std::endl;
+
+
+	delete res;
+	delete mult;
+	delete subs;
+
+
+
+
+
+
+
+//	delete mat1;
+//	delete mat2;
+
+
+
+
+
+
+//	ExpressionRename *expr = parse("test.txt");
+//	if (expr == nullptr)
+//	{
+//		std::cout << "No expression found." << std::endl;
+//		return 0;
+//	}
+//
+//	expr->print(std::cout, 0);
+//	std::cout << std::endl;
+//
+//	delete expr;
 }
 
 

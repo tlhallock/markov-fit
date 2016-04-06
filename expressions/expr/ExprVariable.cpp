@@ -42,11 +42,11 @@ ExpressionRename* ExprVariable::simplify(const SimplificationRules& rules)
 	return this;
 }
 
-ExpressionRename* ExprVariable::evaluate(
+ExpressionRename* ExprVariable::substitute(
 		const Dictionary& dictionary) const
 {
 	ExpressionRename* expr = dictionary.get(index);
-	return clone();
+	return expr == nullptr ? clone() : expr;
 }
 
 void ExprVariable::print(std::ostream& out, int indentation,

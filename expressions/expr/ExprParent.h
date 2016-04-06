@@ -27,11 +27,10 @@ public:
 	ExpressionRename *clone() const;
 
 	virtual ExpressionRename* simplify(const SimplificationRules& rules);
-
-	virtual ExpressionRename* evaluate(const Dictionary& dictionary) const;
+	ExpressionRename* substitute(const Dictionary& dictionary) const;
 
 	virtual void print(std::ostream& out, int indentation,
-			const ExpressionOutputFlags& flags) const;
+			const ExpressionOutputFlags& flags = ExpressionOutputFlags{}) const;
 
 	bool contains_variable(int variable) const;
 

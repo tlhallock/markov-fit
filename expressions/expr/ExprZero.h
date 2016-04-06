@@ -15,15 +15,18 @@ public:
 	ExprZero();
 	virtual ~ExprZero();
 
-	virtual ExpressionRename* clone() const;
-	virtual ExpressionRename* differentiate(const int variable) const;
-	virtual ExpressionRename* evaluate(const Dictionary& dictionary) const;
+	ExpressionRename* clone() const;
+	ExpressionRename* differentiate(const int variable) const;
+	ExpressionRename* substitute(const Dictionary& dictionary) const;
 
-	virtual expr_type get_type() const;
+	expr_type get_type() const;
 
 
-	virtual void print(std::ostream& out, int indentation,
+	Result* evaluate() const;
+
+	void print(std::ostream& out, int indentation,
 			const ExpressionOutputFlags& flags) const;
+
 	bool contains_variable(int variable) const;
 };
 

@@ -46,6 +46,7 @@ void Dictionary::put(const int variable, const ExpressionRename&& val)
 	if (variable >= n)
 		return;
 
+	delete values[variable];
 	values[variable] = val.clone();
 }
 

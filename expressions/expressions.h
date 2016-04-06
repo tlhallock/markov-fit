@@ -21,6 +21,8 @@
 #include "expr/ExprPower.h"
 #include "expr/ExprNegation.h"
 
+#include "expr/ExprMatrix.h"
+
 
 
 #endif /* EXPR_EXPRESSIONS_H_ */

@@ -54,13 +54,24 @@ expr_type ExprDivision::get_type() const
 
 ExpressionRename* ExprDivision::simplify(const SimplificationRules& rules)
 {
+	numerator = expr_simplify(numerator);
+	denominator = expr_simplify(denominator);
+	while (denominator->get_type() == EXPRESSION_TYPE_DIVISION)
+	{
+		ExprDivision *d = (ExprDivision *) denominator;
+		numerator = expr_simplify(new ExprMultiply{numerator, d->denominator});
+		denominator = d->numerator;
+		d->numerator = nullptr;
+		d->denominator = nullptr;
+		delete d;
+	}
 	return this;
 }
 
-ExpressionRename* ExprDivision::evaluate(const Dictionary& dictionary) const
+ExpressionRename* ExprDivision::substitute(const Dictionary& dictionary) const
 {
-	ExpressionRename *top = numerator->evaluate(dictionary);
-	ExpressionRename *bottom = denominator->evaluate(dictionary);
+	ExpressionRename *top = numerator->substitute(dictionary);
+	ExpressionRename *bottom = denominator->substitute(dictionary);
 
 	if (top->get_type() == EXPRESSION_TYPE_VALUE && bottom->get_type() == EXPRESSION_TYPE_VALUE)
 	{
@@ -81,6 +92,35 @@ void ExprDivision::print(std::ostream& out, int indentation,
 	out << ")/(";
 	denominator->print(out, indentation+1, flags);
 	out << ")";
+}
+
+void divide(Result *res, double val)
+{
+	int r = res->rows();
+	int c = res->cols();
+	for (int i=0;i<r;i++)
+		for (int j=0;j<c;j++)
+			res->set(i, j, res->value(i, j) / val);
+}
+
+Result* ExprDivision::evaluate() const
+{
+	Result *n = numerator->evaluate();
+	Result *d = numerator->evaluate();
+	if (n->is_scalar())
+	{
+		divide(d, n->value(0, 0));
+		delete n;
+		return d;
+	}
+	if (d->is_scalar())
+	{
+		divide(n, d->value(0, 0));
+		delete d;
+		return n;
+	}
+
+	throw 1;
 }
 
 bool ExprDivision::contains_variable(int variable) const

@@ -41,7 +41,7 @@ ExpressionRename* ExprValue::simplify(const SimplificationRules& rules)
 	return this;
 }
 
-ExpressionRename* ExprValue::evaluate(const Dictionary& dictionary) const
+ExpressionRename* ExprValue::substitute(const Dictionary& dictionary) const
 {
 	return clone();
 }
@@ -66,4 +66,11 @@ void ExprValue::negate()
 bool ExprValue::contains_variable(int variable) const
 {
 	return false;
+}
+
+Result* ExprValue::evaluate() const
+{
+	Result *returnValue = new Result{1, 1};
+	returnValue->set(0, 0, value);
+	return returnValue;
 }

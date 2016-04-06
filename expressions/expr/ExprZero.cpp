@@ -27,10 +27,19 @@ ExpressionRename* ExprZero::differentiate(const int variable) const
 	return clone();
 }
 
-ExpressionRename* ExprZero::evaluate(const Dictionary& dictionary) const
+ExpressionRename* ExprZero::substitute(const Dictionary& dictionary) const
 {
 	return new ExprValue { 0 };
 }
+
+
+Result* ExprZero::evaluate() const
+{
+	Result *returnValue = new Result{1, 1};
+	returnValue->set(0, 0, 0);
+	return returnValue;
+}
+
 
 expr_type ExprZero::get_type() const
 {
@@ -40,9 +49,12 @@ expr_type ExprZero::get_type() const
 void ExprZero::print(std::ostream& out, int indentation,
 		const ExpressionOutputFlags& flags) const
 {
-	for (int i = 0; i < indentation; i++)
-		out << '\t';
-	out << '0' << '\n';
+	if (flags.indent)
+		for (int i = 0; i < indentation; i++)
+			out << '\t';
+	out << '0';
+	if (flags.indent)
+		out << '\n';
 }
 
 bool ExprZero::contains_variable(int variable) const

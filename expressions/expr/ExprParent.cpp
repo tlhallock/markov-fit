@@ -23,7 +23,7 @@ ExpressionRename* ExprParent::simplify(const SimplificationRules& rules)
 	return this;
 }
 
-ExpressionRename* ExprParent::evaluate(
+ExpressionRename* ExprParent::substitute(
 		const Dictionary& dictionary) const
 {
 	// use <algorithm>
@@ -32,7 +32,7 @@ ExpressionRename* ExprParent::evaluate(
 
 	const auto end = children.end();
 	for (auto it = children.begin(); it != end; ++it)
-		returnValue->children.push_back((*it)->evaluate(dictionary));
+		returnValue->children.push_back((*it)->substitute(dictionary));
 
 	return returnValue;
 }
@@ -40,6 +40,11 @@ ExpressionRename* ExprParent::evaluate(
 void ExprParent::print(std::ostream& out, int indentation,
 		const ExpressionOutputFlags& flags) const
 {
+	if (children.size() == 0)
+	{
+		std::cout << "Nothing to print!!!!!!!!" << std::endl;
+		throw 1;
+	}
 	auto it = children.begin();
 	auto end = children.end();
 
@@ -92,7 +97,7 @@ ExprParent::ExprParent(char c) :
 ExprParent::~ExprParent()
 {
 	auto it = children.begin();
-	auto end = children.end();
+	const auto end = children.end();
 	for (; it != end; ++it)
 	{
 		delete *it;

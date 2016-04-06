@@ -43,7 +43,7 @@ void ExprOne::print(std::ostream& out, int indentation,
 		out << '\n';
 }
 
-ExpressionRename* ExprOne::evaluate(const Dictionary& dictionary) const
+ExpressionRename* ExprOne::substitute(const Dictionary& dictionary) const
 {
 	return new ExprValue { 1 };
 }
@@ -51,4 +51,11 @@ ExpressionRename* ExprOne::evaluate(const Dictionary& dictionary) const
 bool ExprOne::contains_variable(int variable) const
 {
 	return false;
+}
+
+Result* ExprOne::evaluate() const
+{
+	Result *returnValue = new Result{1, 1};
+	returnValue->set(0, 0, 1.0);
+	return returnValue;
 }

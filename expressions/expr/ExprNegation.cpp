@@ -44,12 +44,20 @@ ExpressionRename* ExprNegation::simplify(const SimplificationRules& rules)
 		((ExprNegation *) child)->child = nullptr;
 		return gchild;
 	}
+	else if (child->get_type() == EXPRESSION_TYPE_ADDITION)
+	{
+		// TODO
+	}
+	else if (child->get_type() == EXPRESSION_TYPE_SUBTRACTION)
+	{
+		// TODO
+	}
 	return this;
 }
 
-ExpressionRename* ExprNegation::evaluate(const Dictionary& dictionary) const
+ExpressionRename* ExprNegation::substitute(const Dictionary& dictionary) const
 {
-	ExpressionRename *evaluated = child->evaluate(dictionary);
+	ExpressionRename *evaluated = child->substitute(dictionary);
 	if (evaluated->get_type() == EXPRESSION_TYPE_VALUE)
 		((ExprValue *) evaluated)->negate();
 	return evaluated;
@@ -61,6 +69,15 @@ void ExprNegation::print(std::ostream& out, int indentation,
 	out << "-(";
 	child->print(out, indentation+1, flags);
 	out << ")";
+}
+
+Result* ExprNegation::evaluate() const
+{
+	Result *returnValue = child->evaluate();
+	for (int i=0;i<returnValue->rows();i++)
+		for (int j=0;j<returnValue->cols(); j++)
+			returnValue->set(i, j, -returnValue->value(i, j));
+	return returnValue;
 }
 
 bool ExprNegation::contains_variable(int variable) const

@@ -25,7 +25,7 @@ public:
 	ExpressionRename* differentiate(const int variable) const;
 	expr_type get_type() const;
 	ExpressionRename* simplify(const SimplificationRules& rules);
-	ExpressionRename* evaluate(const Dictionary& dictionary) const;
+	Result* evaluate() const;
 };
 
 #endif /* EXPR_EXPRMULTIPLY_H_ */

@@ -14,6 +14,7 @@
 #include "Dictionary.h"
 #include "ExpressionOutputFlags.h"
 #include "SimplificationRules.h"
+#include "Result.h"
 
 typedef enum
 {
@@ -63,13 +64,15 @@ public:
 	 * If this is returned, then the expression is still valid.
 	 * Otherwise, this expression should be deleted.
 	 */
-	virtual ExpressionRename* simplify(const SimplificationRules& rules) { return this; };
+	virtual ExpressionRename* simplify(const SimplificationRules& rules = SimplificationRules{}) { return this; };
+
+	virtual ExpressionRename* substitute(const Dictionary& dictionary) const = 0;
 
 	/**
-	 * Returns a new expression that results from evaluating this expression with the given dictionary.
-	 * The previous expression is still valid.
+	 * Returns a new expression that results from evaluating this expression.
+	 * The expression must not have any variables left.
 	 */
-	virtual ExpressionRename* evaluate(const Dictionary& dictionary) const = 0;
+	virtual Result* evaluate() const = 0;
 
 	/**
 	 * Prints the expression to the specified output stream.

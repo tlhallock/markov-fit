@@ -11,6 +11,7 @@
 
 #include "ExprMatrix.h"
 #include "ExprValue.h"
+#include "ExprZero.h"
 
 #include <algorithm>
 
@@ -26,14 +27,7 @@ ExprAddition::ExprAddition() :
 {
 }
 
-ExprAddition::~ExprAddition()
-{
-	const auto end = children.end();
-	for (auto it = children.begin(); it != end; ++it)
-	{
-		delete *it;
-	}
-}
+ExprAddition::~ExprAddition() {}
 
 ExpressionRename* ExprAddition::differentiate(const int variable) const
 {
@@ -58,6 +52,9 @@ ExpressionRename* ExprAddition::simplify(const SimplificationRules& rules)
 	if (children.size() == 1)
 		return children.front()->clone();
 
+	print(std::cout, 0);
+	std::cout << std::endl;
+
 	ExprParent::simplify(rules);
 	ExprParent::collapse();
 
@@ -67,29 +64,74 @@ ExpressionRename* ExprAddition::simplify(const SimplificationRules& rules)
 		return expr_matrix_simplify_sum(children);
 	}
 
-	const auto end = children.end();
-	auto it = children.begin();
-	while (it != end)
+	// Simplify zeros
 	{
-		ExpressionRename *child;
-		ExprMatrix *mat;
-		switch ((*it)->get_type())
+		const auto end = children.end();
+		auto it = children.begin();
+		while (it != end)
 		{
-		case EXPRESSION_TYPE_ZERO:
-			child = (*it);
-			children.erase(it++);
-			delete child;
-			break;
-		case EXPRESSION_TYPE_MATRIX:
-			mat = (ExprMatrix *)(*it);
-			children.erase(it++);
-			children.insert(it, expr_simplify(mat->to_expr()));
-			delete mat;
-			break;
-		default:
-			++it;
+			ExpressionRename *child;
+			ExprMatrix *mat;
+			switch ((*it)->get_type())
+			{
+			case EXPRESSION_TYPE_MATRIX:
+				// Can't be matrix expression, otherwise would have already returned.
+				mat = (ExprMatrix *)(*it);
+				children.erase(it++);
+				children.insert(it, expr_simplify(mat->to_expr()));
+				delete mat;
+
+				// What if the matrix value was zero?
+				break;
+			case EXPRESSION_TYPE_ZERO:
+				child = (*it);
+				children.erase(it++);
+				delete child;
+				break;
+			default:
+				++it;
+			}
 		}
 	}
+
+	if (children.size() == 0)
+	{
+		return new ExprZero{};
+	}
+
+	if (1 < std::count_if (children.begin(), children.end(), [](const ExpressionRename *expr)
+	{
+		return expr->get_type() == EXPRESSION_TYPE_VALUE || expr->get_type() == EXPRESSION_TYPE_ONE;
+	}))
+	{
+		double value = 0;
+		const auto end = children.end();
+		auto it = children.begin();
+		while (it != end)
+		{
+			ExpressionRename *child;
+			ExprMatrix *mat;
+			switch ((*it)->get_type())
+			{
+			case EXPRESSION_TYPE_VALUE:
+				child = (*it);
+				children.erase(it++);
+				value += ((ExprValue *)child)->get_value();
+				delete child;
+				break;
+			case EXPRESSION_TYPE_ONE:
+				child = (*it);
+				children.erase(it++);
+				value += 1;
+				delete child;
+				break;
+			default:
+				++it;
+			}
+		}
+		children.push_front(new ExprValue{value});
+	}
+
 	return this;
 }
 
@@ -108,41 +150,73 @@ bool expr_add_is_value(const ExpressionRename* expr)
 	return expr->get_type() == EXPRESSION_TYPE_VALUE;
 }
 
-ExpressionRename* ExprAddition::evaluate(const Dictionary& dictionary) const
+Result* ExprAddition::evaluate() const
 {
-	ExprAddition* addition = (ExprAddition *) ExprParent::evaluate(dictionary);
+	Result *returnValue = nullptr;
+	int rows = -1;
+	int cols = -1;
 
-	bool removed = false;
-	double value = 0.0;
-	const auto end = addition->children.end();
-	auto it = addition->children.begin();
-
-	while (it != end)
+	const auto end = children.end();
+	for (auto it = children.begin(); it != end; ++it)
 	{
-		if ((*it)->get_type() != EXPRESSION_TYPE_VALUE)
+		Result *next = (*it)->evaluate();
+
+		if (returnValue == nullptr)
 		{
-			it++;
-			continue;
+			returnValue = next;
+			rows = returnValue->rows();
+			cols = returnValue->cols();
+		}
+		else
+		{
+			if (rows != next->rows() || cols != next->cols())
+				throw -1;
+			for (int i=0;i<rows;i++)
+				for (int j=0;j<cols;j++)
+					returnValue->set(i, j, returnValue->value(i, j) + next->value(i, j));
+			delete next;
 		}
 
-		ExprValue *valexpr = (ExprValue *) (*it);
-		removed = true;
-		addition->children.erase(it++);
-		value += valexpr->get_value();
-		delete valexpr;
 	}
 
-	if (removed)
-	{
-		if (addition->children.empty())
-			return new ExprValue { value };
-
-		addition->children.push_front(new ExprValue { value });
-	}
-
-	return addition;
+	return returnValue;
 }
-
+//
+//ExpressionRename* ExprAddition::substitute(const Dictionary& dictionary) const
+//{
+//	ExprAddition* addition = (ExprAddition *) ExprParent::substitute(dictionary);
+//
+//	bool removed = false;
+//	double value = 0.0;
+//	const auto end = addition->children.end();
+//	auto it = addition->children.begin();
+//
+//	while (it != end)
+//	{
+//		if ((*it)->get_type() != EXPRESSION_TYPE_VALUE)
+//		{
+//			it++;
+//			continue;
+//		}
+//
+//		ExprValue *valexpr = (ExprValue *) (*it);
+//		removed = true;
+//		addition->children.erase(it++);
+//		value += valexpr->get_value();
+//		delete valexpr;
+//	}
+//
+//	if (removed)
+//	{
+//		if (addition->children.empty())
+//			return new ExprValue { value };
+//
+//		addition->children.push_front(new ExprValue { value });
+//	}
+//
+//	return addition;
+//}
+//
 
 
 

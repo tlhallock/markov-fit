@@ -8,6 +8,8 @@
 #include "ExprMatrix.h"
 
 #include "ExprZero.h"
+#include "ExprOne.h"
+#include "ExprVariable.h"
 #include "ExprAddition.h"
 #include "ExprMultiply.h"
 
@@ -38,13 +40,36 @@ const ExpressionRename* ExprMatrix::get(int i, int j) const
 
 void ExprMatrix::set(int i, int j, ExpressionRename* expr)
 {
+	delete elems[i*n + j];
 	elems[i * n + j] = expr;
 }
 
-ExpressionRename* ExprMatrix::multiply(const ExprMatrix* expr) const
+Result* ExprMatrix::evaluate() const
+{
+	Result *returnValue = new Result{m, n};
+
+	for (int i=0;i<m;i++)
+	{
+		for (int j=0;j<n;j++)
+		{
+			Result *r = get(i, j)->evaluate();
+			if (!r->is_scalar())
+				throw 1;
+			returnValue->set(i, j, r->value(0, 0));
+			delete r;
+		}
+	}
+
+	return returnValue;
+}
+
+ExprMatrix* ExprMatrix::multiply(const ExprMatrix* expr) const
 {
 	if (n != expr->m)
 		throw 2;
+
+	if (m == 0 || expr->n == 0)
+		throw 1;
 
 	ExprMatrix * returnValue = new ExprMatrix{m, expr->n};
 
@@ -52,20 +77,22 @@ ExpressionRename* ExprMatrix::multiply(const ExprMatrix* expr) const
 	{
 		for (int j=0;j<expr->n;j++)
 		{
-			ExpressionRename *e = new ExprZero{};
+			ExprAddition *addition = new ExprAddition{};
 			for (int k=0;k<n;k++)
 			{
-				ExpressionRename *e1 = get(i, k)->clone();
-				ExpressionRename *e2 = get(k, j)->clone();
-				ExpressionRename *m  = new ExprMultiply{e1, e2};
-				e = new ExprAddition{e, m};
+				addition->add(
+					new ExprMultiply{
+						get(i, k)->clone(),
+						expr->get(k, j)->clone()});
 			}
-			returnValue->set(i, j, e);
+			returnValue->set(i, j, addition);
+			addition->print(std::cout, 0);
+			std::cout << std::endl;
 		}
 	}
 
-	for (int i=0;i<m*n;i++)
-		returnValue->elems[i] = elems[i]->clone();
+//	for (int i=0;i<m*n;i++)
+//		returnValue->elems[i] = elems[i]->clone();
 
 	return returnValue;
 }
@@ -102,12 +129,12 @@ ExpressionRename* ExprMatrix::simplify(const SimplificationRules& rules)
 	return this;
 }
 
-ExpressionRename* ExprMatrix::evaluate(const Dictionary& dictionary) const
+ExpressionRename* ExprMatrix::substitute(const Dictionary& dictionary) const
 {
 	ExprMatrix * returnValue = new ExprMatrix{m, n};
 
 	for (int i=0;i<m*n;i++)
-		returnValue->elems[i] = elems[i]->evaluate(dictionary);
+		returnValue->elems[i] = elems[i]->substitute(dictionary);
 
 	return returnValue;
 }
@@ -122,9 +149,11 @@ void ExprMatrix::print(std::ostream& out, int indentation,
 		for (int j=0;j<n;j++)
 		{
 			get(i, j)->print(out, indentation, flags);
-			out << ", ";
+			if (j < n-1)
+				out << ", ";
 		}
-		out << ";";
+		if (i < m-1)
+			out << "; ";
 	}
 
 
@@ -179,3 +208,23 @@ ExpressionRename* ExprMatrix::to_expr() const
 
 	return elems[0]->clone();
 }
+
+ExprMatrix* create_identity(int nrows)
+{
+	ExprMatrix *returnValue = new ExprMatrix{nrows, nrows};
+	for (int i=0;i<nrows;i++)
+		for (int j=0;j<nrows;j++)
+			returnValue->set(i, j, (i == j) ? (ExpressionRename *)(new ExprOne{}) : (ExpressionRename *)(new ExprZero{}));
+	return returnValue;
+}
+
+ExprMatrix* create_variable_matrix(int nrows)
+{
+	int var = 0;
+	ExprMatrix *returnValue = new ExprMatrix{nrows, nrows};
+	for (int i=0;i<nrows;i++)
+		for (int j=0;j<nrows;j++)
+			returnValue->set(i, j, new ExprVariable{var++});
+	return returnValue;
+}
+

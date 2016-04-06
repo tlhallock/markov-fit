@@ -23,7 +23,8 @@ public:
 	void print(std::ostream& out, int indentation,
 			const ExpressionOutputFlags& flags) const;
 
-	ExpressionRename* evaluate(const Dictionary& dictionary) const;
+	Result* evaluate() const;
+	ExpressionRename* substitute(const Dictionary& dictionary) const;
 	bool contains_variable(int variable) const;
 };
 
