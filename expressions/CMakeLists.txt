@@ -28,7 +28,7 @@ FILE(GLOB expr_src expr/*.cpp)
 FILE(GLOB parser_src parsers/calc.tab.cpp parsers/parser_utils.cpp parsers/lex.yy.c)
 #add_library(parser ${parser_src})
 
-add_executable(TestExpr test.cpp ${expr_src} ${parser_src})
+add_executable(TestExpr test.cpp create_matrix_exp.cpp ${expr_src} ${parser_src})
 
 #target_link_libraries(TextExpr parser)
 #target_link_libraries(TestExpr expr)

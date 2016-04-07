@@ -35,6 +35,10 @@ ExpressionRename* expr_simplify(ExpressionRename* rename, const SimplificationRu
 				delete matrix;
 			}
 		}
+		if (rename->get_type() == EXPRESSION_TYPE_VALUE)
+		{
+
+		}
 
 		ExpressionRename* simplified = rename->simplify(rules);
 		if (simplified == rename)
