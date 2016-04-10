@@ -29,7 +29,7 @@ FILE(GLOB local local/local_search_params.cpp local/local_search.cpp)
 FILE(GLOB global global/random_search.cpp)
 
 
-add_executable(TestDirect test.cpp ${stats} ${local} ${test} ${markov} ${global} ${ransample})
+add_executable(TestDirect test.cpp generated.cpp ${stats} ${local} ${test} ${markov} ${global} ${ransample} )
 
 #target_link_libraries(TestDirect stats)
 #target_link_libraries(TestDirect local)

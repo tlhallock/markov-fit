@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 {
 	std::srand ( unsigned ( std::time(0) ) );
 
-	int num_states = 3;
+	int num_states = 4;
 
 
 	Cdf *desired = create_cauchy_dist(100, 100000, 10, 3);
