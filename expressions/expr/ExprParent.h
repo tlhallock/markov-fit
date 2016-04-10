@@ -35,7 +35,9 @@ public:
 	bool contains_variable(int variable) const;
 
 	std::list<ExpressionRename*>& get_children();
-
 };
+
+void print_list(const std::list<ExpressionRename *> list, char c, std::ostream& out, int indentation, const ExpressionOutputFlags& flags);
+
 
 #endif /* EXPR_EXPRPARENT_H_ */

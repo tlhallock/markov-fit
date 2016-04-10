@@ -7,7 +7,7 @@
 
 #include "markov/mexp.h"
 
-#include "gsl_linalg.h"
+#include "gsl/gsl_linalg.h"
 
 
 

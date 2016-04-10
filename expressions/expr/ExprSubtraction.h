@@ -23,6 +23,8 @@ public:
 	expr_type get_type() const;
 	ExpressionRename* simplify(const SimplificationRules& rules);
 	Result* evaluate() const;
+
+	void get_resulting_dimensions(int& m, int& n) const;
 };
 
 #endif /* EXPR_EXPRSUBTRACTION_H_ */

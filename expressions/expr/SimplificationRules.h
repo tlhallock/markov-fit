@@ -15,6 +15,7 @@ public:
 	bool simplify_exponentian;
 
 	SimplificationRules();
+	SimplificationRules(bool m, bool e);
 	virtual ~SimplificationRules();
 };
 

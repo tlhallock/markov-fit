@@ -90,32 +90,16 @@ Generator::~Generator()
   delete[] probs;
 }
 
-void Generator::randomize(double var)
+void Generator::randomize(std::function<double()> fun)
 {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::normal_distribution<> d(0,var);
 	for (int i=0;i<n*n;i++)
 	{
-		probs[i] = d(gen);
-		// oops, not what I meant... (should change distro)
+		probs[i] = fun();
+		// oops, not what I meant... (should change distro if this happens...)
 		if (probs[i] < 0)
 			probs[i] = -probs[i];
 	}
 	
-	normalize();
-}
-
-void Generator::randomize(std::mt19937& gen, std::normal_distribution<>& dist)
-{
-	for (int i=0;i<n*n;i++)
-	{
-		probs[i] = dist(gen);
-		// oops, not what I meant... (should change distro)
-		if (probs[i] < 0)
-			probs[i] = -probs[i];
-	}
-
 	normalize();
 }
 

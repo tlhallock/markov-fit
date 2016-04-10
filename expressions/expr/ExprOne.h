@@ -26,6 +26,8 @@ public:
 	Result* evaluate() const;
 	ExpressionRename* substitute(const Dictionary& dictionary) const;
 	bool contains_variable(int variable) const;
+
+	void get_resulting_dimensions(int& m, int& n) const;
 };
 
 

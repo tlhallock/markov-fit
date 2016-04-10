@@ -6,6 +6,7 @@
 #include "stats/cdf.h"
 
 #include <random>
+#include <functional>
 
 #include "markov_chain.h"
 
@@ -33,8 +34,7 @@ public:
 			Cdf& cdf,
 			Cdf& tmp,
 			double tol,
-			std::mt19937& gen,
-			std::uniform_real_distribution<>& unif);
+			std::function<double()> unif);
 
 	bool communicative(const double minimum) const;
 };

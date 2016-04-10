@@ -8,6 +8,9 @@
 #include "ExpressionRename.h"
 
 #include "ExprMatrix.h"
+#include "ExprOne.h"
+#include "ExprZero.h"
+#include "ExprValue.h"
 
 ExpressionRename::ExpressionRename()
 {
@@ -26,6 +29,16 @@ ExpressionRename* expr_simplify(ExpressionRename* rename, const SimplificationRu
 {
 	while (true)
 	{
+		if (rename == nullptr)
+		{
+			std::cout << "Why null?" << std::endl;
+			throw 1;
+		}
+
+//		std::cout << "Simplifying " << std::endl;
+//		rename->print(std::cout, 0);
+//		std::cout << std::endl;
+
 		if (rename->get_type() == EXPRESSION_TYPE_MATRIX)
 		{
 			ExprMatrix *matrix = (ExprMatrix *) rename;
@@ -37,7 +50,17 @@ ExpressionRename* expr_simplify(ExpressionRename* rename, const SimplificationRu
 		}
 		if (rename->get_type() == EXPRESSION_TYPE_VALUE)
 		{
-
+			double val = ((ExprValue*) rename)->get_value();
+			if (val == 0.0)
+			{
+				delete rename;
+				rename = new ExprZero{};
+			}
+			else if (val == 1)
+			{
+				delete rename;
+				rename = new ExprOne{};
+			}
 		}
 
 		ExpressionRename* simplified = rename->simplify(rules);

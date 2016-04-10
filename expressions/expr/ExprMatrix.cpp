@@ -228,3 +228,13 @@ ExprMatrix* create_variable_matrix(int nrows)
 	return returnValue;
 }
 
+bool ExprMatrix::is_expr() const
+{
+	return m == 1 && n == 1;
+}
+
+void ExprMatrix::get_resulting_dimensions(int& m, int& n) const
+{
+	m = this->m;
+	n = this->n;
+}

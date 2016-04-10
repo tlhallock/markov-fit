@@ -3,6 +3,7 @@
 #define GENERATOR_H_
 
 #include <random>
+#include <functional>
 
 #include "markov_chain.h"
 
@@ -23,8 +24,7 @@ class Generator
 
 	Generator& operator=(const Generator& other);
 
-	void randomize(double var = 1.0);
-	void randomize(std::mt19937& gen, std::normal_distribution<>& dist);
+	void randomize(std::function<double()> fun);
 
 	int get_size() const { return n; }
 	double get_prob(int i, int j) const { return probs[n * i + j]; }

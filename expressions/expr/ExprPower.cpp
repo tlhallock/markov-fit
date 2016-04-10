@@ -6,10 +6,12 @@
  */
 
 #include "ExprPower.h"
+
 #include "ExprMultiply.h"
 #include "ExprOne.h"
 #include "ExprSubtraction.h"
 #include "ExprValue.h"
+#include "ExprMatrix.h"
 
 #include <cmath>
 
@@ -37,6 +39,17 @@ ExpressionRename* ExprPower::differentiate(const int variable) const
 		throw 1;
 	}
 
+	int m, n; get_resulting_dimensions(m, n);
+	if (m > 1 || n > 1)
+	{
+		SimplificationRules rules { true, true };
+		ExpressionRename *rename = expr_simplify(clone(), rules);
+		ExpressionRename *returnValue = rename->differentiate(variable);
+		delete rename;
+		return returnValue;
+	}
+
+
 	ExprMultiply * mult = new ExprMultiply{};
 	mult->multiply(power->clone());
 	mult->multiply(new ExprPower{base->clone(), new ExprSubtraction{power->clone(), new ExprOne{}}});
@@ -59,12 +72,44 @@ ExpressionRename* ExprPower::simplify(const SimplificationRules& rules)
 	{
 		ExpressionRename *returnValue = base;
 		base = nullptr;
-		return base;
+		return returnValue;
 	}
 
 	if (power->get_type() == EXPRESSION_TYPE_ZERO)
 	{
+		if (base->get_type() == EXPRESSION_TYPE_MATRIX)
+		{
+			ExprMatrix *matrix = (ExprMatrix*) base;
+			int m = matrix->get_m();
+			if (matrix->get_n() != m)
+			{
+				throw 1;
+			}
+			return create_identity(m);
+		}
 		return new ExprOne{};
+	}
+
+	if (base->get_type() == EXPRESSION_TYPE_ZERO)
+	{
+		ExpressionRename *returnValue = base;
+		base = nullptr;
+		return returnValue;
+	}
+
+	if (base->get_type() == EXPRESSION_TYPE_MATRIX && rules.simplify_exponentian && rules.simplify_matrix_multiplication)
+	{
+		if (power->get_type() != EXPRESSION_TYPE_VALUE)
+		{
+			std::cout << "Unable to simplify not values." << std::endl;
+			throw 1;
+		}
+		int p = (int) ((ExprValue *) power)->get_value(); // Not necessarily integer...
+
+		ExprMultiply *multiply = new ExprMultiply{};
+		for (int i=0;i<p; i++)
+			multiply->multiply(base->clone());
+		return expr_simplify(multiply, rules);
 	}
 
 	return this;

@@ -80,6 +80,9 @@ public:
 	virtual void print(std::ostream& out, int indentation, const ExpressionOutputFlags& flags = ExpressionOutputFlags{}) const = 0;
 
 	virtual bool contains_variable(int variable) const = 0;
+
+	/** If, when this expression is evaluated, it will return a matrix expression. **/
+	virtual void get_resulting_dimensions(int& m, int& n) const = 0;
 };
 
 /**

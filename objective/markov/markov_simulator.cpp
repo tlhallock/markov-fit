@@ -58,8 +58,7 @@ double MarkovSimulator::simulate(
 		Cdf& cdf,
 		Cdf& tmp,
 		double tol,
-		std::mt19937& gen,
-		std::uniform_real_distribution<>& unif)
+		std::function<double()> unif)
 {
 	const int initialState = 0;
 	const int hittingState = nstates-1;
@@ -77,8 +76,8 @@ double MarkovSimulator::simulate(
 			double time = 0;
 			while (state != hittingState)
 			{
-				time += -log(unif(gen)) / lambdas[state];
-				state = ransampl_draw(comps[state], unif(gen), unif(gen));
+				time += -log(unif()) / lambdas[state];
+				state = ransampl_draw(comps[state], unif(), unif());
 			}
 
 			cdf.sample(time);

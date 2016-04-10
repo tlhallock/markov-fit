@@ -13,9 +13,23 @@ ExpressionRename* ExprParent::simplify(const SimplificationRules& rules)
 	// use <algorithm>
 	if (children.size() == 1)
 		return children.front()->clone();
+//	if (children.size() == 0)
+//	{
+//		std::cout << "Empty multiplication..." << std::endl;
+//	}
 
 	std::list<ExpressionRename*> copy{children};
 	children.clear();
+
+//	{
+//		std::cout << "About to simplify (" << copy.size() << ")" << std::endl;
+//		auto end = copy.end();
+//		for (auto it = copy.begin(); it != end; ++it)
+//		{
+//			(*it)->print(std::cout, 0);
+//			std::cout << std::endl;
+//		}
+//	}
 
 	auto end = copy.end();
 	for (auto it = copy.begin(); it != end; ++it)
@@ -40,47 +54,7 @@ ExpressionRename* ExprParent::substitute(
 void ExprParent::print(std::ostream& out, int indentation,
 		const ExpressionOutputFlags& flags) const
 {
-	if (children.size() == 0)
-	{
-		std::cout << "Nothing to print!!!!!!!!" << std::endl;
-		throw 1;
-	}
-	auto it = children.begin();
-	auto end = children.end();
-
-	if (flags.indent)
-		for (int i = 0; i < indentation; i++)
-			out << '\t';
-	out << '(';
-
-	if (flags.indent)
-		out << '\n';
-
-	(*it)->print(out, indentation + 1);
-	++it;
-
-	while (it != end)
-	{
-		if (flags.indent)
-			for (int i = 0; i < indentation; i++)
-				out << '\t';
-		out << ')';
-
-		if (flags.indent)
-			out << '\n';
-		out << type << '(';
-		if (flags.indent)
-			out << '\n';
-		(*it)->print(out, indentation + 1);
-		++it;
-	}
-	if (flags.indent)
-		for (int i = 0; i < indentation; i++)
-			out << '\t';
-	out << ')';
-
-	if (flags.indent)
-		out << '\n';
+	print_list(children, type, out, indentation, flags);
 }
 
 std::list<ExpressionRename*>& ExprParent::get_children()
@@ -151,4 +125,51 @@ bool ExprParent::contains_variable(int variable) const
 			return true;
 	}
 	return false;
+}
+
+
+
+void print_list(const std::list<ExpressionRename *> list, char c, std::ostream& out, int indentation, const ExpressionOutputFlags& flags)
+{
+	if (list.size() == 0)
+	{
+		std::cout << "Nothing to print!!!!!!!!" << std::endl;
+		throw 1;
+	}
+	auto it = list.begin();
+	auto end = list.end();
+
+	if (flags.indent)
+		for (int i = 0; i < indentation; i++)
+			out << '\t';
+	out << '(';
+
+	if (flags.indent)
+		out << '\n';
+
+	(*it)->print(out, indentation + 1);
+	++it;
+
+	while (it != end)
+	{
+		if (flags.indent)
+			for (int i = 0; i < indentation; i++)
+				out << '\t';
+		out << ')';
+
+		if (flags.indent)
+			out << '\n';
+		out << c << '(';
+		if (flags.indent)
+			out << '\n';
+		(*it)->print(out, indentation + 1);
+		++it;
+	}
+	if (flags.indent)
+		for (int i = 0; i < indentation; i++)
+			out << '\t';
+	out << ')';
+
+	if (flags.indent)
+		out << '\n';
 }

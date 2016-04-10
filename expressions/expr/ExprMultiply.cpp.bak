@@ -14,31 +14,31 @@
 #include "ExprOne.h"
 
 #include <algorithm>
+#include <functional>
 
 
-ExprMultiply::ExprMultiply(ExpressionRename* l, ExpressionRename* r) :
-		ExprParent { '*' }
+ExprMultiply::ExprMultiply(ExpressionRename* l, ExpressionRename* r)
 {
-	children.push_back(l);
-	children.push_back(r);
+	multiply(l); multiply(r);
 }
 
-ExprMultiply::ExprMultiply() :
-	ExprParent{'*'}
-{
-}
-
+ExprMultiply::ExprMultiply() {}
 
 ExprMultiply::~ExprMultiply() {}
 
 
-ExprParent* ExprMultiply::newOne() const
-{
-	return new ExprMultiply{};
-}
-
 ExpressionRename* ExprMultiply::differentiate(const int variable) const
 {
+	if (matrices.size() > 1)
+	{
+		throw 1;
+	}
+
+	std::list<ExpressionRename *> children;
+	children.insert(children.begin(), matrices.begin(), matrices.end());
+	children.insert(children.begin(), scalars.begin(), scalars.end());
+
+
 	ExprAddition *addition = new ExprAddition{};
 
 	int index = 0;
@@ -106,17 +106,23 @@ void multiply_matrices(std::list<ExpressionRename*>& mats)
 		throw 1;
 	}
 }
+
 }
 
 ExpressionRename* ExprMultiply::simplify(const SimplificationRules& rules)
 {
-	if (children.size() == 1)
-		return children.front()->clone();
+	if (scalars.size() == 1 && matrices.size() == 0)
+		return scalars.front()->clone();
+	if (matrices.size() == 1 && scalars.size() == 0)
+		return matrices.front()->clone();
 
 	//		if (children.size() == 0)
 	//			return none();
-	ExprParent::simplify(rules);
-	ExprParent::collapse();
+//	ExprParent::simplify(rules);
+//	ExprParent::collapse();
+
+
+
 
 	// sort all the values/variables/zeros/ones to the front
 
@@ -125,46 +131,6 @@ ExpressionRename* ExprMultiply::simplify(const SimplificationRules& rules)
 	{
 		// clean up all consecutive matrix multiplications...
 		multiply_matrices(children);
-
-//		const auto end = children.end();
-//		auto it = children.begin();
-//
-//		while (it != end)
-//		{
-//			if ((*it)->get_type() != EXPRESSION_TYPE_MATRIX)
-//			{
-//				it++;
-//				continue;
-//			}
-//			ExprMatrix *m1 = (*it);
-//			if (++it != end && (*it)->get_type() != EXPRESSION_TYPE_MATRIX)
-//			{
-//
-//			}
-//
-//			ExprMatrix *valexpr = (ExprMatrix *) (*it);
-//			children.erase(it++);
-//			matrices.push_back(valexpr);
-//		}
-//
-//		// could do something smarter...
-//		ExprMatrix *m = nullptr;
-//		const auto e = matrices.end();
-//		for (auto i = matrices.begin(); i != e; ++i)
-//		{
-//			if (m == nullptr)
-//			{
-//				m = *i;
-//				continue;
-//			}
-//			// UGLY!!!!
-//			ExprMatrix *n = m->multiply(*i);
-//			delete m;
-//			delete *i;
-//			m = n;
-//		}
-//
-//		children.push_back(expr_simplify(m));
 	}
 
 	// TODO: clean up all matrix-scalar multiplications...
@@ -198,25 +164,40 @@ ExpressionRename* ExprMultiply::simplify(const SimplificationRules& rules)
 
 void ExprMultiply::multiply(ExpressionRename* factor)
 {
-	children.push_back(factor);
+	int m, n;
+	factor->get_resulting_dimensions(m, n);
+	if (m == 1 && n == 1)
+		scalars.push_back(factor);
+	else
+		matrices.push_back(factor);
 }
 
-//
-//ExpressionRename* ExprMultiply::substitute(
-//		const Dictionary& dictionary) const
-//{
-//	ExprMultiply* multiplication = (ExprMultiply *) ExprParent::substitute(dictionary);
-//
-//	// I should break this up between a simplify/substitute/evaluate
-//
-//	const auto end = multiplication->children.end();
-//
-//
-//
-//
-//	return multiplication;
-//}
 
+ExpressionRename* ExprMultiply::substitute(
+		const Dictionary& dictionary) const
+{
+	ExprMultiply * returnValue = new ExprMultiply{};
+
+	{
+		const auto end = scalars.end();
+		for (auto it = scalars.begin(); it!=end; ++it)
+		{
+			returnValue->scalars.push_back((*it)->substitute(dictionary));
+		}
+	}
+	{
+		const auto end = matrices.end();
+		for (auto it = matrices.begin(); it!=end; ++it)
+		{
+			returnValue->matrices.push_back((*it)->substitute(dictionary));
+		}
+	}
+
+	return returnValue;
+}
+
+namespace
+{
 void multiply_it(double val, Result *other)
 {
 	int rows = other->rows();
@@ -229,6 +210,7 @@ void multiply_it(double val, Result *other)
 		}
 	}
 }
+}
 
 /** Could evaluate WAY more multiplications than necessary... **/
 Result* ExprMultiply::evaluate() const
@@ -236,86 +218,113 @@ Result* ExprMultiply::evaluate() const
 	Result *previus = nullptr;
 	int lastRows;
 
-	const auto end = children.end();
-	auto it = children.begin();
+
+	double scalar = 1.0;
+	{
+		const auto end = scalars.end();
+		for (auto it = scalars.begin(); it != end; ++it)
+		{
+			Result *result = (*it)->evaluate();
+			scalar *= result->value(0, 0);
+			delete result;
+		}
+	}
+
+	const auto end = matrices.end();
+	auto it = matrices.begin();
 
 	Result *current = (*it)->evaluate();
 	++it;
 	while (it != end)
 	{
 		Result *next = (*it)->evaluate();
-		if (next->rows() != current->cols())
+
+		int mk = next->rows();
+		int nr = current->rows();
+		int nc = next->cols();
+
+		if (mk != current->cols())
 		{
-			if (current->is_scalar())
+			throw 1;
+		}
+
+		Result *building = new Result { nr, nc };
+		for (int i = 0; i < nr; i++)
+		{
+			for (int j = 0; j < nc; j++)
 			{
-				multiply_it(current->value(0, 0), next);
-				delete current;
-				current = next;
-			}
-			else if (next->is_scalar())
-			{
-				multiply_it(next->value(0, 0), current);
-				delete next;
-			}
-			else
-			{
-				throw 1;
+				double val = 0;
+
+				for (int k = 0; k < mk; k++)
+					val += current->value(i, k) * next->value(k, j);
+
+				building->set(i, j, val);
 			}
 		}
-		else
-		{
-			int mk = next->rows();
-			int nr = current->rows();
-			int nc = next->cols();
-			Result *building = new Result{nr, nc};
-			for (int i=0;i<nr;i++)
-			{
-				for (int j=0;j<nc; j++)
-				{
-					double val = 0;
 
-					for (int k=0;k<mk;k++)
-						val += current->value(i, k) * next->value(k, j);
-
-					building->set(i, j, val);
-				}
-			}
-
-			delete current;
-			delete next;
-			current = building;
-		}
+		delete current;
+		delete next;
+		current = building;
 
 		++it;
 	}
 
+	multiply_it(scalar, current);
+
 	return current;
 }
 
-
 void ExprMultiply::get_resulting_dimensions(int& m, int& n) const
 {
-        if (matrices.size() == 0)
-        {
-                m = (scalars.size() == 0) ? -1 : 1;
-                n = (scalars.size() == 0) ? -1 : 1;
-                return;
-        }
+	if (matrices.size() == 0)
+	{
+		m = (scalars.size() == 0) ? -1 : 1;
+		n = (scalars.size() == 0) ? -1 : 1;
+		return;
+	}
 
-        int om, on;
+	int om, on;
 
-        const auto end = matrices.end();
-        auto it = matrices.begin();
-        (*it)->get_resulting_dimensions(m, n);
-        for (++it;it!=end;++it)
-        {
-                (*it)->get_resulting_dimensions(om, on);
-                if (om != n)
-                        throw 1;
-                else
-                        n = on;
-        }
+	const auto end = matrices.end();
+	auto it = matrices.begin();
+	(*it)->get_resulting_dimensions(m, n);
+	for (++it;it!=end;++it)
+	{
+		(*it)->get_resulting_dimensions(om, on);
+		if (om != n)
+			throw 1;
+		else
+			n = on;
+	}
 }
+
+bool ExprMultiply::contains_variable(int variable) const
+{
+	auto has_it = [variable](const ExpressionRename *r) { return r->contains_variable(variable); };
+	return std::any_of (scalars.begin(), scalars.end(), has_it)
+		|| std::any_of(matrices.begin(), matrices.end(), has_it);
+}
+
+void print_list(const std::list<ExpressionRename *> list, char c, std::ostream& out, int indentation, const ExpressionOutputFlags& flags)
+void ExprMultiply::print(std::ostream& out, int indentation,
+		const ExpressionOutputFlags& flags) const
+{
+	if (scalars.size() == 0)
+	{
+		print_list(matrices, '*', out, indentation, flags);
+		return;
+	}
+
+	print_list(scalars, '*', out, indentation, flags);
+
+	if (matrices.size() != 0)
+	{
+		// need to worry about indentation...
+		out << "*" << std::endl;
+		print_list(matrices, '*', out, indentation, flags);
+	}
+}
+
 
 // FUTURE WORK: be WAY smarter
 //

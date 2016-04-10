@@ -33,9 +33,9 @@ int main(int argc, char **argv)
 	dictionary.put(2, ExprValue{3.0});
 	dictionary.put(3, ExprValue{5.0});
 
-	for (int i=1;i<highest_order;i++)
-	{
-		ExpressionRename *exp = create_matrix_exponential(2, i);
+//	for (int i=1;i<highest_order;i++)
+//	{
+		ExpressionRename *exp = create_matrix_exponential(2, 2);
 		std::cout << "matrix exp: " << std::endl;
 		exp->print(std::cout, 0);
 		std::cout << std::endl;
@@ -45,25 +45,30 @@ int main(int argc, char **argv)
 		exp->print(std::cout, 0);
 		std::cout << std::endl;
 
-		std::cout << "substituted: " << std::endl;
-		ExpressionRename *value = exp->substitute(dictionary);
-		value->print(std::cout, 0);
-		std::cout << std::endl;
-
 		std::cout << "simplified: " << std::endl;
-		value = expr_simplify(value);
-		value->print(std::cout, 0);
+		exp = expr_simplify(exp, SimplificationRules{true, true});
+		exp->print(std::cout, 0);
 		std::cout << std::endl;
-
-		std::cout << "result: " << std::endl;
-		Result *res = value->evaluate();
-		res->print(std::cout);
-		std::cout << std::endl;
+//
+//		std::cout << "substituted: " << std::endl;
+//		ExpressionRename *value = exp->substitute(dictionary);
+//		value->print(std::cout, 0);
+//		std::cout << std::endl;
+//
+//		std::cout << "simplified: " << std::endl;
+//		value = expr_simplify(value);
+//		value->print(std::cout, 0);
+//		std::cout << std::endl;
+//
+//		std::cout << "result: " << std::endl;
+//		Result *res = value->evaluate();
+//		res->print(std::cout);
+//		std::cout << std::endl;
 
 		delete exp;
-		delete value;
-		delete res;
-	}
+//		delete value;
+//		delete res;
+//	}
 
 
 

@@ -14,6 +14,7 @@
 #include "ExprZero.h"
 
 #include <algorithm>
+#include <functional>
 
 ExprAddition::ExprAddition(ExpressionRename* l, ExpressionRename* r) :
 	ExprParent{'+'}
@@ -47,18 +48,51 @@ expr_type ExprAddition::get_type() const
 	return EXPRESSION_TYPE_ADDITION;
 }
 
+
+
+void ExprAddition::get_resulting_dimensions(int& m, int& n) const
+{
+	if (children.size() == 0)
+	{
+		n = m = -1;
+		return;
+	}
+
+	children.front()->get_resulting_dimensions(m, n);
+
+	int mo, no;
+	auto end = children.end();
+	for (auto it = children.begin(); it!=end; ++it)
+	{
+		(*it)->get_resulting_dimensions(mo, no);
+		if (mo != m || no != n)
+		{
+			throw 1;
+		}
+	}
+}
+
+
+
+
+
 ExpressionRename* ExprAddition::simplify(const SimplificationRules& rules)
 {
 	if (children.size() == 1)
 		return children.front()->clone();
 
-	print(std::cout, 0);
-	std::cout << std::endl;
-
 	ExprParent::simplify(rules);
 	ExprParent::collapse();
 
+	std::cout << "In addition, about to simplify: " << std::endl;
+	print(std::cout, 0);
+	std::cout << std::endl;
+
 	bool is_matrix = children.front()->get_type() == EXPRESSION_TYPE_MATRIX;
+	is_matrix = std::all_of(children.begin(), children.end(), [](const ExpressionRename *r)
+	{
+		return r->get_type() == EXPRESSION_TYPE_MATRIX;
+	});
 	if (is_matrix)
 	{
 		return expr_matrix_simplify_sum(children);
@@ -75,8 +109,13 @@ ExpressionRename* ExprAddition::simplify(const SimplificationRules& rules)
 			switch ((*it)->get_type())
 			{
 			case EXPRESSION_TYPE_MATRIX:
-				// Can't be matrix expression, otherwise would have already returned.
 				mat = (ExprMatrix *)(*it);
+				if (!mat->is_expr())
+				{
+					++it;
+					break;
+				}
+				// Can't be matrix expression, otherwise would have already returned. (This is not true when the expression is not fully simplified according to the rules.)
 				children.erase(it++);
 				children.insert(it, expr_simplify(mat->to_expr()));
 				delete mat;

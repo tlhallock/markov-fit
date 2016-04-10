@@ -26,6 +26,8 @@ public:
 	Result* evaluate() const;
 	void print(std::ostream& out, int indentation, const ExpressionOutputFlags& flags = ExpressionOutputFlags{}) const;
 	bool contains_variable(int variable) const;
+
+	void get_resulting_dimensions(int& m, int& n) const;
 };
 
 #endif /* EXPR_EXPRNEGATION_H_ */

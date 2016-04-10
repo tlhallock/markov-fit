@@ -127,3 +127,22 @@ bool ExprDivision::contains_variable(int variable) const
 {
 	return numerator->contains_variable(variable) || denominator->contains_variable(variable);
 }
+
+void ExprDivision::get_resulting_dimensions(int& m, int& n) const
+{
+	int m1, n1, m2, n2;
+	denominator->get_resulting_dimensions(m1, n1);
+	numerator->get_resulting_dimensions(m2, n2);
+
+	if (m2 == 1 && n2 == 1)
+	{
+		m = m1; n = n1;
+		return;
+	}
+	if (m1 == 1 && n1 == 1)
+	{
+		m = m2; n = n2;
+		return;
+	}
+	throw 1;
+}

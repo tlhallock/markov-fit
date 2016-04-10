@@ -45,20 +45,10 @@ public:
 	void print(std::ostream& out, int indentation, const ExpressionOutputFlags& flags = ExpressionOutputFlags{}) const;
 	bool contains_variable(int variable) const;
 
+	bool is_expr() const;
 	ExpressionRename* to_expr() const;
 
-
-
-
-
-
-
-
-
-
-
-
-
+	void get_resulting_dimensions(int& m, int& n) const;
 
 	ExprMatrix* multiply(const ExprMatrix* expr) const;
 };
