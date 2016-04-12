@@ -20,11 +20,15 @@ email: Anahita.Hassanzadeh@gmail.com
 """
 import numpy as np
 from blackbox_opt.bb_optimize import bb_optimize
-import _chi2
+import myfunc
+
+#from myfunc import getInitialQ
+#from myfunc import evaluateCost
 
 def sphere(x):
 	"""The sphere function"""
-	res = _chi2.chi2(x)    
+	#res = _chi2.chi2(x)    
+	res = myfunc.evaluateCost(x) 
 	return res
 
 
@@ -56,7 +60,7 @@ if __name__ == "__main__":
 	# options.
 	
 	func = sphere
-	x_0 = np.array([1.3, 0.7, 0.8, 1.9, 1.2])
+	x_0 = myfunc.getInitialQ(5); # np.array([1.3, 0.7, 0.8, 1.9, 1.2])
 	
 	
 	print "\n\n********* Function " + func.__name__ + "********"
@@ -66,22 +70,22 @@ if __name__ == "__main__":
 		"sample_gen": "auto", "verbosity": 0}
 	get_results(func, x_0, alg, options)
 
-	alg = "Powell"
-	options = {"disp": True, "maxfev": 100, "ftol": 1e-26}
-	get_results(func, x_0, alg, options)
+	#alg = "Powell"
+	#options = {"disp": True, "maxfev": 100, "ftol": 1e-26}
+	#get_results(func, x_0, alg, options)
 	
-	alg = "Nelder-Mead"
-	options = {"disp": True, "maxfev": 100, "ftol": 1e-26}
-	get_results(func, x_0, alg, options)
+	#alg = "Nelder-Mead"
+	#options = {"disp": True, "maxfev": 100, "ftol": 1e-26}
+	#get_results(func, x_0, alg, options)
 	
-	alg = 'COBYLA'
-	options = {"disp": True, "tol": 1e-25}
-	get_results(func, x_0, alg, options)
+	#alg = 'COBYLA'
+	#options = {"disp": True, "tol": 1e-25}
+	#get_results(func, x_0, alg, options)
 	
-	alg = 'BFGS'
-	options = {"maxiter": 8, "disp": True, "gtol": 1e-5}
-	get_results(func, x_0, alg, options)
+	#alg = 'BFGS'
+	#options = {"maxiter": 8, "disp": True, "gtol": 1e-5}
+	#get_results(func, x_0, alg, options)
 	
-	alg = 'SLSQP'
-	options = {"maxiter": 20, "disp": True, "ftol": 1e-26}
-	get_results(func, x_0, alg, options)
+	#alg = 'SLSQP'
+	#options = {"maxiter": 20, "disp": True, "ftol": 1e-26}
+	#get_results(func, x_0, alg, options)
